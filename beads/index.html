@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>비즈 도안 메이커 | 사진으로 무료 비즈 도안 만들기 (아트칼·펄러·하마)</title>
+<meta name="description" content="사진, 글자, 템플릿을 비즈(펄러비즈·아트칼·하마) 도안으로 바꿔 주는 무료 도구. 실제 판매 색 번호로 맞추고 색깔별 필요한 구슬 개수를 바로 계산해요. 회원가입 없이, 사진은 기기 안에서만 처리돼요.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="비즈 도안 메이커 — 사진 한 장으로 비즈 도안 만들기">
+<meta property="og:description" content="아트칼·펄러·하마·MARD 실제 색 번호로 맞춘 비즈 도안과 색깔별 구슬 개수를 무료로.">
+<meta name="theme-color" content="#E0306F">
+<!-- 애드센스: tools.pengkira.com 연결 후 아래 주석을 풀고 ca-pub 번호를 넣으세요
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+-->
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: pegboard is the hero on the left with its tools; settings rail on the right; stacks board-first on phones */
+:root{
+  --bg:#EDF0F5; --surface:#FFFFFF; --ink:#18202F; --muted:#5B6477; --line:#D3D9E3;
+  --accent:#E0306F; --accent-soft:#FCE3EC; --accent-ink:#FFFFFF;
+  --peg:#E3E7EE; --peg-dot:#C3CAD7; --guide:#9AA4B6; --boardline:#E0306F; --well:#F6F7FA;
+  --display:"Do Hyeon","IBM Plex Sans KR",system-ui,sans-serif;
+  --body:"IBM Plex Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11141B; --surface:#1A1E28; --ink:#E8ECF3; --muted:#98A1B3; --line:#2B3141;
+  --accent:#FF5A97; --accent-soft:#3A1F2C; --accent-ink:#1A0B12;
+  --peg:#222735; --peg-dot:#363D4F; --guide:#5A6479; --boardline:#FF5A97; --well:#151922; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#11141B; --surface:#1A1E28; --ink:#E8ECF3; --muted:#98A1B3; --line:#2B3141;
+  --accent:#FF5A97; --accent-soft:#3A1F2C; --accent-ink:#1A0B12;
+  --peg:#222735; --peg-dot:#363D4F; --guide:#5A6479; --boardline:#FF5A97; --well:#151922; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:16px;padding-block:28px 56px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:22px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.1rem,5vw,3.1rem);line-height:1.05;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.lede{margin:8px 0 0;color:var(--muted);max-width:56ch}
+.strip{display:flex;gap:6px;flex-wrap:wrap}
+.strip i{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,var(--bg) 0 27%,var(--c) 29% 100%);box-shadow:inset 0 -2px 0 rgba(0,0,0,.14)}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+
+.stats{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:12px}
+.stat{display:flex;flex-direction:column}
+.stat b{font-family:var(--mono);font-weight:600;font-size:1.05rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.72rem;color:var(--muted);letter-spacing:.04em}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;align-items:center}
+.tool{font:inherit;font-size:.84rem;font-weight:500;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:7px 11px;cursor:pointer}
+.tool[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.tool:disabled{opacity:.4;cursor:default}
+.toolbar .sp{flex:1}
+.board-scroll{overflow:auto;max-height:76vh;border-radius:10px;background:var(--well);display:flex;padding:8px}
+.board-scroll canvas{display:block;margin:auto;touch-action:pan-x pan-y}
+.board-scroll.active canvas{touch-action:none;cursor:crosshair}
+.toolhint{font-size:.8rem;color:var(--muted);margin:8px 0 0;min-height:1.3em}
+
+.picker{margin-top:14px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:14px}
+.pick-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cur{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 220px}
+.cur .big{width:38px;height:38px;border-radius:50%;flex:none;background:radial-gradient(circle,var(--surface) 0 22%,var(--c,#ccc) 24% 100%);box-shadow:inset 0 -2px 0 rgba(0,0,0,.15),0 0 0 1px var(--line)}
+.cur .t{font-size:.86rem;min-width:0}
+.cur .t b{font-family:var(--mono)}
+.cur .t small{display:block;color:var(--muted)}
+.hexbox{display:flex;gap:6px;align-items:center}
+.hexbox input[type=text]{width:108px;font-family:var(--mono)}
+.hexbox input[type=color]{width:38px;height:38px;border:1px solid var(--line);border-radius:9px;padding:2px;background:var(--surface);cursor:pointer}
+.palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(26px,1fr));gap:5px;max-height:172px;overflow:auto;padding:2px}
+.sw{width:26px;height:26px;border-radius:50%;border:2px solid transparent;padding:0;cursor:pointer;background:radial-gradient(circle,var(--surface) 0 22%,var(--c) 24% 100%);box-shadow:inset 0 -2px 0 rgba(0,0,0,.15),0 0 0 1px var(--line)}
+.sw[aria-pressed="true"]{border-color:var(--ink);transform:scale(1.1)}
+.sw:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lab-s{font-size:.78rem;color:var(--muted);letter-spacing:.03em}
+
+.legend-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+h2{font-family:var(--display);font-weight:400;font-size:1.45rem;margin:0}
+.total{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--accent);font-weight:600}
+.legend{width:100%;border-collapse:collapse;font-size:.9rem}
+.legend th{white-space:nowrap;text-align:left;font-weight:500;font-size:.72rem;color:var(--muted);letter-spacing:.05em;padding:4px 6px;border-bottom:1px solid var(--line)}
+.legend td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.legend .n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.legend .no{font-family:var(--mono);color:var(--muted);width:2.4em}
+.legend tr[data-i]{cursor:pointer}
+.legend tr[data-i]:hover td{background:var(--accent-soft)}
+.legend tr.on td{background:var(--accent-soft)}
+.dot{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--c);vertical-align:-3px;margin-right:8px;box-shadow:0 0 0 1px var(--line)}
+.code{font-family:var(--mono);font-weight:600;margin-right:6px}
+.cname{color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn{font:inherit;font-weight:600;border-radius:10px;padding:10px 14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.small{padding:6px 10px;font-size:.82rem;font-weight:500}
+.btn:disabled{opacity:.45;cursor:default}
+
+.controls{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+@media (max-width:900px){.controls{position:static}}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--bg);border-radius:10px;padding:4px;gap:4px;margin-bottom:16px}
+.tab{font:inherit;font-weight:600;border:0;border-radius:8px;padding:8px;background:transparent;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.panel{display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field>label,.lab{font-size:.85rem;font-weight:500;display:flex;justify-content:space-between;gap:8px}
+.field label output{font-family:var(--mono);color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=text],input[type=number],select{font:inherit;width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tpl{font:inherit;font-size:.82rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px 4px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tpl[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.tpl canvas{width:52px;height:52px}
+.drop{border:1.5px dashed var(--guide);border-radius:12px;padding:18px 14px;text-align:center;color:var(--muted);cursor:pointer;font-size:.88rem}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop strong{color:var(--ink);display:block;font-size:1rem;margin-bottom:2px}
+.guidebox{display:flex;flex-direction:column;gap:8px}
+.guidebox canvas{width:100%;height:auto;max-height:300px;object-fit:contain;border-radius:10px;border:1px solid var(--line);background:repeating-conic-gradient(var(--line) 0 25%,var(--surface) 0 50%) 0 0/14px 14px;cursor:crosshair;touch-action:manipulation}
+.guide-foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.check{display:flex;gap:8px;align-items:center;font-size:.88rem;cursor:pointer}
+.check input{accent-color:var(--accent);width:16px;height:16px;flex:none}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;font:inherit;font-size:.84rem;padding:7px 8px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;white-space:nowrap}
+.seg button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.sec{font-family:var(--display);font-size:1.15rem;margin:0}
+hr{border:0;border-top:1px solid var(--line);margin:18px 0 14px}
+.note{font-size:.78rem;color:var(--muted);margin:0}
+
+.modal{position:fixed;inset:0;background:rgba(10,12,18,.6);display:grid;place-items:center;padding:16px;z-index:10}
+.modal-box{background:var(--surface);border-radius:14px;padding:16px;max-width:min(760px,100%);max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:10px}
+.modal-box img{border-radius:8px;border:1px solid var(--line);background:#fff}
+.modal-box textarea{font-family:var(--mono);font-size:.85rem;width:100%;min-height:220px;padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:.88rem;z-index:20;max-width:calc(100% - 32px);text-align:center}
+@media (prefers-reduced-motion:no-preference){.sw{transition:transform .12s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>비즈 도안 메이커</h1>
+      <p class="lede">사진, 글자, 템플릿을 구슬 도안으로 바꿔요. 아트칼·펄러·하마·MARD 실제 판매 색 번호로 맞추고, 색깔별 필요한 개수를 세어 줍니다.</p>
+    </div>
+    <div class="strip" aria-hidden="true">
+      <i style="--c:#D7263D"></i><i style="--c:#F28C28"></i><i style="--c:#F7D23E"></i><i style="--c:#A8D65A"></i><i style="--c:#8FD3F4"></i><i style="--c:#B9A3DB"></i><i style="--c:#F49AC1"></i>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="col">
+      <div class="card">
+        <div class="stats" id="stats"></div>
+        <div class="toolbar" id="toolbar">
+          <button class="tool" data-t="paint" aria-pressed="false">칠하기</button>
+          <button class="tool" data-t="fill" aria-pressed="false">같은 색 채우기</button>
+          <button class="tool" data-t="erase" aria-pressed="false">지우개</button>
+          <button class="tool" data-t="wand" aria-pressed="false">덩어리 지우기</button>
+          <button class="tool" data-t="pick" aria-pressed="false">색 뽑기</button>
+          <span class="sp"></span>
+          <button class="tool" id="undoBtn" disabled>되돌리기</button>
+        </div>
+        <div class="board-scroll" id="boardWrap"><canvas id="board" aria-label="비즈 도안 미리보기"></canvas></div>
+        <p class="toolhint" id="toolHint"></p>
+
+        <div class="picker">
+          <div class="pick-row">
+            <div class="cur"><span class="big" id="curDot"></span><div class="t" id="curText"></div></div>
+            <div class="hexbox">
+              <input type="text" id="hexIn" value="#E0306F" maxlength="7" aria-label="원하는 색 HEX 코드" spellcheck="false">
+              <input type="color" id="colorIn" value="#e0306f" aria-label="색 고르기">
+              <button class="btn small" id="eyeBtn">스포이드</button>
+            </div>
+          </div>
+          <p class="note" id="matchNote">HEX 코드를 넣거나 스포이드로 화면의 색을 찍으면 가장 가까운 판매 색을 찾아 붓에 담아요.</p>
+          <div class="lab-s">판매 색 전체 (<span id="palCount"></span>색)</div>
+          <div class="palette" id="palette"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="legend-head"><h2>필요한 구슬</h2><span class="total" id="total"></span></div>
+        <div style="overflow-x:auto">
+          <table class="legend">
+            <thead><tr><th>번호</th><th>판매 색</th><th class="n">개수</th></tr></thead>
+            <tbody id="legendBody"></tbody>
+          </table>
+        </div>
+        <p class="note" style="margin-top:8px">줄을 누르면 그 색만 판에서 진하게 보여요. 다시 누르면 해제돼요.</p>
+        <div class="actions">
+          <button class="btn primary" id="exportBtn">도안 이미지 만들기</button>
+          <button class="btn" id="copyBtn">색 목록 복사</button>
+          <button class="btn" id="swapBtn" disabled>선택한 색을 붓 색으로 모두 바꾸기</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card controls">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="tab-template" aria-selected="true">템플릿</button>
+        <button class="tab" role="tab" id="tab-photo" aria-selected="false">사진</button>
+        <button class="tab" role="tab" id="tab-text" aria-selected="false">글자</button>
+      </div>
+
+      <div class="panel" id="panel-template">
+        <div class="tpl-grid" id="tplGrid"></div>
+      </div>
+
+      <div class="panel" id="panel-photo" hidden>
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="사진 올리기">
+          <strong>사진 올리기</strong>눌러서 고르거나 끌어다 놓기, 붙여넣기도 돼요
+        </div>
+        <input type="file" id="file" accept="image/*" hidden>
+        <div class="guidebox" id="thumbRow" hidden>
+          <canvas id="thumb" aria-label="원본 사진과 지워질 배경 미리보기"></canvas>
+          <div class="seg" id="markSeg"><button data-m="bg" aria-pressed="true">배경 찍기</button><button data-m="keep" aria-pressed="false">살릴 곳 찍기</button></div>
+          <div class="guide-foot"><span class="note">흐린 부분이 지워질 배경이에요. 사진을 눌러 직접 고를 수 있어요.</span><button class="btn small" id="clearMarks">표시 지우기</button></div>
+        </div>
+        <div class="field"><label for="imgW">가로 칸 수 <output id="imgWOut">29</output></label><input type="range" id="imgW" min="12" max="100" value="29">
+          <div class="seg" id="wPresets"><button data-w="29">판 1장 (29)</button><button data-w="43">43</button><button data-w="58">판 2장 (58)</button></div>
+        </div>
+        <div class="field"><label for="maxColors">최대 색 수 <output id="maxColorsOut">10</output></label><input type="range" id="maxColors" min="2" max="30" value="10"></div>
+        <div class="field"><label for="bgTol">자동 배경 지우기 강도 <output id="bgTolOut">14</output></label><input type="range" id="bgTol" min="0" max="50" value="14">
+          <p class="note">0이면 자동 지우기를 꺼요. 배경이 남으면 올리고, 피사체가 깎이면 내리거나 '살릴 곳 찍기'로 지켜 주세요.</p></div>
+        <label class="check"><input type="checkbox" id="crop" checked> 피사체에 맞춰 자르기</label>
+        <label class="check"><input type="checkbox" id="clean" checked> 잡티 정리 (튀는 구슬 한 알 정리)</label>
+        <label class="check"><input type="checkbox" id="outline"> 테두리 두르기 (검정 한 줄)</label>
+        <p class="note">사진은 기기 안에서만 처리되고 어디에도 올라가지 않아요. 설정을 바꾸면 직접 고친 부분은 다시 계산돼요.</p>
+      </div>
+
+      <div class="panel" id="panel-text" hidden>
+        <div class="field"><label for="textIn">글자 (이니셜·이름)</label><input type="text" id="textIn" maxlength="8" value="LOVE"></div>
+        <div class="field"><label for="textH">글자 높이 (칸) <output id="textHOut">10</output></label><input type="range" id="textH" min="6" max="28" value="10"></div>
+        <p class="note">글자 색은 아래 붓 색을 고른 뒤 '글자에 붓 색 적용'을 누르세요. 한글은 높이 14칸 이상이 잘 읽혀요.</p>
+        <button class="btn small" id="textColorBtn">글자에 붓 색 적용</button>
+      </div>
+
+      <hr>
+      <div class="panel">
+        <h3 class="sec">구슬과 판</h3>
+        <div class="field"><label for="brand">구슬 브랜드</label><select id="brand"></select></div>
+        <div class="field"><span class="lab">판 모양</span>
+          <div class="seg" id="shapeSeg"><button data-v="square" aria-pressed="true">사각 판</button><button data-v="round" aria-pressed="false">원형 판</button></div>
+        </div>
+        <div class="field" id="sqField"><label for="boardN">사각 판 한 장 칸 수 <output id="boardNOut">29</output></label><input type="range" id="boardN" min="10" max="60" value="29"></div>
+        <div class="field" id="rdField" hidden><label for="roundD">원형 판 지름 (칸) <output id="roundDOut">29</output></label><input type="range" id="roundD" min="12" max="60" value="29"><p class="note">원 밖으로 나가는 구슬은 잘려요. 가지고 있는 판의 지름 칸 수에 맞춰 주세요.</p></div>
+        <label class="check"><input type="checkbox" id="guides" checked> 5칸마다 보조선</label>
+        <label class="check"><input type="checkbox" id="nums"> 칸에 색 번호 표시 (도안 따라 꽂기용)</label>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+      <h2 id="modalTitle">도안 이미지</h2>
+      <button class="btn" id="modalClose">닫기</button>
+    </div>
+    <p class="note" id="modalNote"></p>
+    <img id="modalImg" alt="완성된 비즈 도안" hidden>
+    <textarea id="modalText" readonly hidden></textarea>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const BRANDS=[{"id":"artkal_s","name":"아트칼 S","size":"5mm","pitch":0.5,"c":"S01|White|eaeef3|0;S02|Burning Sand|ee927c|0;S03|Tangerine|ffa630|0;S04|Orange|eb6027|0;S05|Tall Poppy|cb3531|0;S06|Raspberry Pink|ef67b2|0;S07|Gray|959698|0;S08|Emerald|1fc467|0;S09|Dark Green|00685e|0;S10|Baby Blue|2eabd8|0;S11|Dark Blue|004fa4|0;S12|Pastel Lavender|9165b2|0;S13|Black|292a2b|0;S14|Sandstorm|e1c835|0;S15|Redwood|9a4541|0;S16|Brown|65463d|0;S17|Light Brown|895d49|0;S18|Sand|dca384|0;S19|Bubble Gun|f2bfb8|0;S20|Green|009053|0;S21|Pastel Green|8bb23a|0;S22|Purple|48337e|0;S23|Royal Purple|644fa4|0;S24|True Blue|0078bf|0;S25|Hot Pink|dc519a|0;S26|Magenta|da4383|0;S27|Yellow|eac125|0;S28|Lily Pink|dda1cc|0;S29|Pastel Yellow|e1d367|0;S30|Shadow Green|9ec9cd|0;S31|Sea Mist|b2d7ce|0;S32|Beeswax|eed39e|0;S33|Maverick|c0b7d7|0;S34|Red|b61927|0;S35|Mona Lisa|e1ccd2|0;S36|Old Pink|ce6d83|0;S37|Blue-Green|60bfcb|0;S38|Burgundy|a3134a|0;S39|Yellow Orange|e68739|0;S40|Carnation Pink|e182b0|0;S41|Copper|9d5b2e|0;S42|Silver|676b73|0;S43|Dark Gray|70757b|0;S44|Sky Blue|a7cdde|0;S45|Medium Turquoise|00a5a1|0;S46|Bright Green|8ec324|0;S47|Marigold|b27938|0;S48|Corn|ecc03d|0;S49|Mulberry Wood|921e5d|0;S50|Mandys Pink|e2a488|0;S51|Spring Sun|dfdabd|0;S52|Picasso|eade7f|0;S53|Turquoise|55a4d9|0;S54|Light Blue|0084ce|0;S55|Pistachio|97cf87|0;S56|Bright Carrot|f96f40|0;S57|Buccaneer|b35540|0;S58|Paprika|b11836|0;S59|Butterfly Bush|4f3989|0;S60|Lavender|8a7ec2|0;S61|Key Lomen Pie|cdc03f|0;S62|Green Tea|00765f|0;S63|Metallic Gold|696046|1;S64|Black Rock|36384d|0;S65|Canary|e2e65d|0;S66|Blaze Orange|e5533c|0;S67|Vanilla|e9c1a6|0;S68|Tan|cc9b74|0;S69|Mine Shaft|383e44|0;S70|Drark Algae|adad29|0;S71|Jade Green|007d2b|0;S72|Light Sea Blue|68c4d2|0;S73|Steel Blue|5ab0bf|0;S74|Azure|009ec2|0;S75|Dark Steel Blue|0084b2|0;S76|Sea Blue|0093a9|0;S77|Ghost While|d4d8d3|0;S78|Ash Grey|c2c4c2|0;S79|Light Gray|a7acad|0;S80|Dark Olive|8f8e3c|0;S81|Deer|bf9168|0;S82|Clay|aa744e|0;S83|Sienna|bb6833|0;S84|Deep Chestnut|be5d65|0;S85|Red Wine|99323a|0;S86|Goldenrod|e8ae00|0;S87|Coral Red|ec625e|0;S88|Dark Pink|d62779|0;S89|Charcoal Gray|565a5e|0;S90|Pastel Orange|d9b35e|0;S91|Brunswick Green|153838|0;S92|Dandelion|cea433|0;S93|Pale Skin|dcb794|0;S94|Warm Blush|dd9285|0;S95|Salmon|e07b69|0;S96|Apricot|ef7f61|0;S97|Papaya|dc772b|0;S98|Himalaya Blue|6aaedb|0;S99|Waterfall|61bbd3|0;S100|Lagoon|279bbe|0;S101|Electric Blue|00a7e3|0;S102|Pool Blue|0077ca|0;S103|Caribbian Blue|005aa9|0;S104|Deep Water|007f9e|0;S105|Petrol Blue|007d91|0;S106|Wegdewood Blue|00649a|0;S107|Pond Blue|006c9f|0;S108|Seashell Beige|cfc179|0;S109|Beige|c4ae64|0;S110|Beach Beige|ab9745|0;S111|Caffe Latté|978138|0;S112|Oaktree Brown|907c41|0;S113|Khaki|b6ae84|0;S114|Light Greengray|a59f65|0;S115|Mossy Green|938d54|0;S116|Earth Green|8d8b51|0;S117|Sage Green|7f7e49|0;S118|Pinetree Green|5b6e35|0;S119|Frosty Blue|8ad5c9|0;S120|Polar Mint|7cd2a5|0;S121|Celadon Green|72ac9a|0;S122|Eucalyptus|00b26f|0;S123|Clover Field|3eb724|0;S124|Pooltable Felt|0d7535|0;S125|Snake Green|007d6e|0;S126|Dark Eucalyptus|006e69|0;S127|Marsmallow Rose|dfc3e1|0;S128|Light Grape|d38ed4|0;S129|Rosebud Pink|d5a6ba|0;S130|Fuschia|d6668e|0;S131|Candy Violet|b8aad9|0;S132|Flamingo|df486d|0;S133|Pink Plum|bc3ca6|0;S134|Amethyst|803897|0;S135|Moonlight Blue|a7bae1|0;S136|Summer Rain|afb8df|0;S137|Azur Blue|6b9ad4|0;S138|Cornflower Blue|5a89ce|0;S139|Forget Me Not|658ad0|0;S140|Indigo|566cbd|0;S141|Horizon Blue|4d74c6|0;S142|Cobolt|416dbe|0;S143|Royal Blue|30429e|0;S144|Marine|024288|0;S145|Pale Yellow Moss|d6ca6a|0;S146|Bloodrose Red|9d1a38|0;S147|Spearmint|80b7a1|0;S148|Mocha|7a594f|0;S149|Creme|efdba1|0;S150|Iris Violet|8884d0|0;S151|Forrest Green|345621|0;S152|Lilac|aeaddc|0;S153|Pale Lilac|bcc3e1|0;S154|Sahara Sand|e3c09a|0;S155|Sunkissed Teint|c58b60|0;S156|Steel Grey|5a5f65|0;S157|Iron Grey|4c5156|0;S158|Pepper|3a3e42|0;S159|Oslo Gray|82878b|0;SE1|Moon|f1f4fa|0;SE2|Raincloud|a2b2d3|0;SE3|Winter|83a6dc|0;SE4|Tide|70d8ed|0;SE5|Aquamarine|69e3d5|0;SE6|Neptune|2a63c8|0;SE7|Rose Quartz|d5aec9|0;SE8|Mauve|af739a|0;SE9|Dark Mauve|704b6d|0;SE10|Wild Berry|d977cd|0;SE11|Sugar Plum|b643ac|0;SE12|Desert|deb181|0;SE13|Peanut|bc9d77|0;SE14|Toffee|ac7f5d|0;SE15|Bark|a37e66|0;SG1|Glow Yellow|c6c0b4|1;SG2|Glow Pink|dfabbc|1;SG3|Glow Blue|6fadc1|1;SL1|Glitter Blue|3687b2|1;SL2|Glitter Green|117c52|1;SL3|Glitter Red|c22933|1;SL4|Glitter Yellow|cdbd00|1;SN1|Neon Orange|ff7405|1;SN2|Neon Green|01c63e|1;SN3|Neon Yellow|f2f33c|1;SN4|Neon Rose|ff477a|1;SP1|Pearlescent Green|93ca87|1;SP2|Pearlescent Tangerine|fe7f54|1;SP3|Pearlescent Orange|f0a149|1;SP4|Pearlescent Pink|dc9ea9|1;SP5|Pearlescent Red|d63c53|1;SP6|Pearlescent Blue|2c4e97|1;SP7|Pearlescent Purple|64427e|1;SP8|Pearlescent White|e0dbca|1;ST1|Transparent|c7bcb8|1;ST2|Transparent Pink|f95498|1;ST3|Transparent Tangering|ff7c45|1;ST4|Transparent Yellow|dadf3d|1;ST5|Transparent Green|0fae58|1;ST6|Transparent Purple|8477b3|1"},{"id":"perler","name":"펄러","size":"5mm","pitch":0.5,"c":"80-15179|Evergreen|305545|0;80-15181|Light Grey|b3bab8|0;80-15182|Lavender|af9fce|0;80-15199|Shamrock|008f53|0;80-15200|Cobalt|0065b1|0;80-15201|Midnight|2f3c55|0;80-15202|Robin's Egg|a9cdd5|0;80-15203|Flamingo|f2afb7|0;80-15204|Salmon|e1747a|0;80-15205|Fawn|c9a385|0;80-15206|Pewter|94a19d|0;80-15207|Charcoal|4f595a|0;80-15208|Toasted Marshmallow|dedace|0;80-15210|Orchid|b1628e|0;80-15211|Tomato|d14337|0;80-15212|Spice|d9593a|0;80-15213|Apricot|f5a168|0;80-15214|Sherbet|d8e47c|0;80-15215|Mist|93b0bd|0;80-15216|Sky|4ac0d8|0;80-15217|Lagoon|00a4ac|0;80-15218|Teal|047f8a|0;80-15219|Fern|7f971a|0;80-15220|Olive|696e31|0;80-15961|Cherry|9d2b3a|0;80-19001|White|eaefee|0;80-19002|Creme|e1e2bb|0;80-19003|Yellow|e7ce3e|0;80-19004|Orange|eb7b31|0;80-19005|Red|b0353c|0;80-19006|Bubblegum|d8729a|0;80-19007|Purple|684b86|0;80-19008|Dark Blue|0e5092|0;80-19009|Light Blue|278cc9|0;80-19010|Dark Green|007b4e|0;80-19011|Light Green|18c7b1|0;80-19012|Brown|674c44|0;80-19017|Grey|909497|0;80-19018|Black|323234|0;80-19020|Rust|995043|0;80-19021|Light Brown|936848|0;80-19033|Peach|e9bfb9|0;80-19035|Tan|c5ac90|0;80-19038|Magenta|e04284|0;80-19052|Pastel Blue|4a9ccf|0;80-19053|Pastel Green|6dcc94|0;80-19054|Pastel Lavender|937fbf|0;80-19056|Pastel Yellow|e9e290|0;80-19057|Cheddar|fbb146|0;80-19058|Toothpaste|96d1d4|0;80-19059|Hot Coral|dd595b|0;80-19060|Plum|a75d9d|0;80-19061|Kiwi Lime|69b845|0;80-19062|Turquoise|0098c5|0;80-19063|Blush|f99297|0;80-19070|Periwinkle Blue|6683b7|0;80-19079|Light Pink|e1bcce|0;80-19080|Green|4dab64|0;80-19083|Pink|d45496|0;80-19088|Raspberry|983864|0;80-19090|Butterscotch|da9964|0;80-19091|Parrot Green|009188|0;80-19092|Dark Grey|585c61|0;80-19093|Blueberry Creme|85a8e3|0;80-19096|Cranapple|843947|0;80-19097|Prickly Pear|bbc938|0;80-19098|Sand|e5be9e|0;80-15240|Mint|b3eed5|0;80-15241|Sour Apple|a3de6f|0;80-15242|Cotton Candy|f479b0|0;80-15243|Grape|503b9c|0;80-15244|Rose|d25d72|0;80-15245|Iris|4e56a3|0;80-15246|Tangerine|fd5918|0;80-15247|Forest|005d57|0;80-15248|Eggplant|6f3255|0;80-15249|Honey|da8c2c|0;80-15250|Gingerbread|7e5446|0;80-15251|Thistle|8c8ca7|0;80-15252|Slate Blue|5e6d7b|0;80-15253|Denim|4c6388|0;80-15254|Sage|9aa98e|0;80-15255|Orange Cream|efb79b|0;80-15256|Fruit Punch|ca3b65|0;80-15257|Fuchsia|cb59b9|0;80-15258|Mulberry|714875|0;80-15259|Slime|c8c85c|0;80-15260|Stone|988c8c|0;80-15261|Dark Spruce|14313b|0;80-15262|Cocoa|392928|0;80-15265|Twilight Plum|c685b1|0;80-15266|Caribbean Sea|6cc8ad|0;80-15267|Frosted Lilac|cdb7c3|0;80-15273|Brick|fc9574|0;80-15274|Rich Butter|f6ca69|0;80-15275|Peacock|0090ac|0;80-15276|Carnation Pink|f8c7c9|0;80-15089|Neon Blue|406ae1|1;80-15268|Sunflower|deba0b|0;80-15269|Lemon|f6d901|0;80-15263|Celery|bed4a6|0;80-15239|Mocha|c8b693|0;80-15272|Coral|ff9a8b|0"},{"id":"hama","name":"하마 미디","size":"5mm","pitch":0.5,"c":"H01|White|e5ecf1|0;H02|Cream|e4e4c5|0;H03|Yellow|e9c704|0;H04|Orange|d14803|0;H05|Red|b4060e|0;H06|Pink|ea8aa5|0;H07|Purple|712297|0;H08|Blue|0239a3|0;H09|Light Blue|025bc3|0;H10|Green|027643|0;H11|Light Green|19cda7|0;H12|Brown|3e271a|0;H13|Transparent Red|c02435|1;H14|Transparent Yellow|e4aa32|1;H16|Transparent Green|37b876|1;H17|Grey|838f98|0;H18|Black|141315|0;H19|Clear|d8d2ce|1;H20|Reddish Brown|8d2a0f|0;H21|Light Brown|be6c21|0;H22|Dark Red|91020a|0;H24|Translucent Purple|683e9a|1;H25|Translucent Brown|87593d|1;H26|Matt Rose|e8a498|0;H27|Beige|dcb18e|0;H28|Dark Green|1e2c1c|0;H29|Claret|bf0142|0;H30|Burgundy|4e0c1b|0;H31|Turquoise|489ab9|0;H32|Neon Fuchsia|ff208d|1;H33|Cerise|ff3956|0;H34|Neon Yellow|e5ef13|1;H35|Neon Red|ff2833|1;H36|Neon Blue|2353b0|1;H37|Neon Green|06b73c|1;H38|Neon Orange|fd8600|1;H39|Fluorescent Yellow|f1f21c|1;H40|Fluorescent Orange|fe630b|1;H41|Fluorescent Blue|2659b2|1;H42|Fluorescent Green|0cbd51|1;H43|Pastel Yellow|e7e45a|0;H44|Pastel Red|f96160|0;H45|Pastel Purple|8e69cd|0;H46|Pastel Blue|51aee4|0;H47|Pastel Green|80df96|0;H48|Pastel Pink|d67ad1|0;H49|Azure|0facd1|0;H60|Teddybear Brown|f0981e|0;H70|Light Grey|a5b3c0|0;H71|Dark Grey|445059|0;H75|Tan|b78c6d|0;H76|Nougat|8a5937|0;H77|Cloudy White|ced1c8|0;H78|Light Peach|f7c1aa|0;H79|Apricot|f87633|0;H82|Plum|91175a|0;H83|Petrol Blue|037a9f|0;H84|Olive Green|687836|0;H95|Pastel Rose|dd9ba3|0;H96|Pastel Lilac|b491ad|0;H97|Pastel Ice Blue|8aafc2|0;H98|Pastel Mint|94cca4|0;H15|Transparent Blue|487ed5|1;H55|Green (Glow in the Dark)|faf8ed|1;H56|Red (Glow in the Dark)|edbf9f|1;H57|Blue (Glow in the Dark)|c4d0e3|1;H61|Gold|d99350|0;H62|Silver|48474a|0;H63|Bronze|42312f|0;H64|Pearl|efebe4|1;H72|Translucent Pink|f097b0|1;H73|Translucent Aqua|59aef5|1;H74|Translucent Lilac|5b55bd|1;H101|Eucalyptus|a9c39b|0;H102|Forest Green|356b2d|0;H103|Light Yellow|ffe660|0;H104|Lime|bcd122|0;H105|Light Apricot|ffac78|0;H106|Light Lavender|ccc5ed|0;H107|Lavender|6a87c1|0;H108|Aubergine|2a2536|0;H109|Cloudy Grey|8a847f|0;H110|Matcha|838956|0;H111|Dark Blush|835854|0;H112|Blush|ad8a82|0;H113|Aqua|5f887b|0;H114|Cherry Red|9a2c31|0;H115|Bright Green|6e975f|0;H116|Midnight Blue|222838|0;H117|Taupe Grey|777169|0;H118|Maroon Red|612932|0;H119|Sky Blue|4167b4|0"},{"id":"artkal_c","name":"아트칼 C","size":"2.6mm","pitch":0.26,"c":"C01|White|eaeef3|0;C02|Black|292a2b|0;C03|Tangerine|ffa630|0;C04|Yellow Orange|e68739|0;C05|Tall Poppy|cb3531|0;C06|Red|b61927|0;C07|Carnation Pink|e182b0|0;C08|Hot Pink|dc519a|0;C09|Magenta|da4383|0;C10|Picasso|eade7f|0;C11|Yellow|eac125|0;C12|Pistachio|97cf87|0;C13|Pastel Green|8bb23a|0;C14|Green|009053|0;C15|Green Tea|00765f|0;C16|Bright Carrot|f96f40|0;C17|Orange|eb6027|0;C18|Sky Blue|a7cdde|0;C19|Baby Blue|2eabd8|0;C20|Light Blue|0084ce|0;C21|Dark Blue|004fa4|0;C22|Bubble Gun|f2bfb8|0;C23|Sand|dca384|0;C24|Beeswax|eed39e|0;C25|Lavender|8a7ec2|0;C26|Pastel Lavender|9165b2|0;C27|Purple|48337e|0;C28|Marigold|b27938|0;C29|Buccaneer|b35540|0;C30|Redwood|9a4541|0;C31|Light Brown|895d49|0;C32|Brown|65463d|0;C33|Gray|959698|0;C34|Dark Gray|70757b|0;C35|Silver|676b73|0;C36|Old Pink|ce6d83|0;C37|True Blue|0078bf|0;C38|Turquoise|55a4d9|0;C39|Shadow Green|9ec9cd|0;C40|Key Lomen Pie|cdc03f|0;C41|Pastel Yellow|e1d367|0;C42|Sandstorm|e1c835|0;C43|Paprika|b11836|0;C44|Burning Sand|ee927c|0;C46|Canary|e2e65d|0;C47|Vanilla|e9c1a6|0;C48|Corn|ecc03d|0;C49|Raspberry Pink|ef67b2|0;C50|Maverick|c0b7d7|0;C51|Spring Sun|dfdabd|0;C52|Butterfly Bush|4f3989|0;C53|Bright Green|8ec324|0;C54|Medium Turquoise|00a5a1|0;C56|Oslo Gray|82878b|0;C58|Black Rock|36384d|0;C60|Sea Mist|b2d7ce|0;C69|Mine Shaft|383e44|0;C70|Brunswick Green|153838|0;C71|Goldenrod|e8ae00|0;C72|Pastel Orange|d9b35e|0;C73|Sienna|bb6833|0;C74|Deer|cdb277|0;C75|Clay|aa744e|0;C76|Coral Red|ec625e|0;C77|Deep Chestnut|be5d65|0;C78|Red Wine|99323a|0;C79|Light Sea Blue|68c4d2|0;C80|Sea Blue|0093a9|0;C81|Steel Blue|5ab0bf|0;C82|Azure|009ec2|0;C83|Dark Steel Blue|0084b2|0;C84|Drark Algae|adad29|0;C85|Dark Olive|8f8e3c|0;C86|Jade Green|007d2b|0;C87|Ghost While|d4d8d3|0;C88|Ash Grey|c2c4c2|0;C89|Light Gray|a7acad|0;C90|Charcoal Gray|565a5e|0;C91|Dandelion|cea433|0;C92|Pale Skin|dcb794|0;C93|Warm Blush|dd9285|0;C94|Salmon|e07b69|0;C95|Apricot|ef7f61|0;C96|Papaya|dc772b|0;C97|Himalaya Blue|6aaedb|0;C98|Waterfall|61bbd3|0;C99|Lagoon|279bbe|0;C100|Electric Blue|00a7e3|0;C101|Pool Blue|0077ca|0;C102|Caribbian Blue|005aa9|0;C103|Deep Water|007f9e|0;C104|Petrol Blue|007d91|0;C105|Wegdewood Blue|00649a|0;C106|Pond Blue|006c9f|0;C107|Seashell Beige|cfc179|0;C108|Beige|c4ae64|0;C109|Beach Beige|ab9745|0;C110|Caffe Latté|978138|0;C111|Oaktree Brown|907c41|0;C112|Khaki|b6ae84|0;C113|Light Greengray|a59f65|0;C114|Mossy Green|938d54|0;C115|Earth Green|8d8b51|0;C116|Sage Green|7f7e49|0;C117|Pinetree Green|5b6e35|0;C118|Frosty Blue|8ad5c9|0;C119|Polar Mint|7cd2a5|0;C120|Celadon Green|72ac9a|0;C121|Eucalyptus|00b26f|0;C122|Clover Field|3eb724|0;C123|Pooltable Felt|0d7535|0;C124|Snake Green|007d6e|0;C125|Dark Eucalyptus|006e69|0;C126|Marsmallow Rose|dfc3e1|0;C127|Light Grape|d38ed4|0;C128|Rosebud Pink|d5a6ba|0;C129|Fuschia|d6668e|0;C130|Candy Violet|b8aad9|0;C131|Flamingo|df486d|0;C132|Pink Plum|bc3ca6|0;C133|Amethyst|803897|0;C134|Moonlight Blue|a7bae1|0;C135|Summer Rain|afb8df|0;C136|Azur Blue|6b9ad4|0;C137|Cornflower Blue|5a89ce|0;C138|Forget Me Not|658ad0|0;C139|Indigo|566cbd|0;C140|Horizon Blue|4d74c6|0;C141|Cobolt|416dbe|0;C142|Royal Blue|30429e|0;C143|Marine|024288|0;C144|Pale Yellow Moss|d6ca6a|0;C145|Bloodrose Red|9d1a38|0;C146|Spearmint|80b7a1|0;C147|Mocha|7a594f|0;C148|Creme|efdba1|0;C149|Iris Violet|8884d0|0;C150|Forrest Green|345621|0;C151|Lilac|aeaddc|0;C152|Pale Lilac|bcc3e1|0;C153|Sahara Sand|e3c09a|0;C154|Sunkissed Teint|c58b60|0;C155|Steel Grey|5a5f65|0;C156|Iron Grey|4c5156|0;C157|Pepper|3a3e42|0;C45|Spring Green|5ddb5d|0;C55|Conifer|6cc24a|0;C57|Fresh Red|bc0423|0;C59|Scarlett|531a23|0;C61|Feta|f1eb9c|0;C62|Carnation|fc3f3f|0;C63|Pink Pearl|eabedb|1;C64|Rose|a50050|0;C65|Mango|ef7e2e|0;C66|Wild Watermelon|fc6c85|0;C67|Orchid|b14eb5|0;C68|Toothpaste Blue|69c2ee|0;CE01|Columbia Blue|c3ced6|0;CE02|Pale Cerulean|9ab2db|0;CE03|Silver Lake Blue|5d88b2|0;CE04|Sky Blue (Crayola)|02bdd1|0;CE05|Maximum Blue Green|52caac|0;CE06|Bright Navy Blue|2d6db2|0;CE07|Black Shadows|c2a3b7|0;CE08|Mountbatten Pink|8a5877|0;CE09|Halayà Úbe|68355d|0;CE10|Deep Mauve|b84fa8|0;CE11|Heliotrope Magenta|b02fa4|0;CE12|Rajah|e2a365|0;CE13|Earth Yellow|be8e59|0;CE14|Chinese Bronze|a87443|0;CE15|Alloy Orange|a06e52|0;CE16|Orchid Pink|f9c1d7|0;CE17|Caput Mortuum|59292b|0"},{"id":"mard","name":"MARD","size":"2.6mm","pitch":0.26,"c":"A1|A1|f9f0cd|0;A10|A10|ff9d55|0;A11|A11|ffdd99|0;A12|A12|fcb58f|0;A13|A13|ffbb59|0;A14|A14|ff6d40|0;A15|A15|fdff44|0;A16|A16|fef9ae|0;A17|A17|ffe36e|0;A18|A18|fecf98|0;A19|A19|fd7b72|0;A2|A2|fbfbd4|0;A20|A20|efcd67|0;A21|A21|ffe395|0;A22|A22|fff3a4|0;A23|A23|f3d5bf|0;A24|A24|fbf8c9|0;A25|A25|ffd67d|0;A26|A26|ffbb27|0;A3|A3|fafc9f|0;A4|A4|ffe953|0;A5|A5|f4d738|0;A6|A6|fdad49|0;A7|A7|ff7c2f|0;A8|A8|eaca49|0;A9|A9|ff995a|0;B1|B1|e6ee32|0;B10|B10|95d3c2|0;B11|B11|5d722a|0;B12|B12|156f40|0;B13|B13|d9f794|0;B14|B14|ade945|0;B15|B15|2e5132|0;B16|B16|c6ed9c|0;B17|B17|9bb13a|0;B18|B18|e6ee49|0;B19|B19|25b88c|0;B2|B2|5be419|0;B20|B20|c2f0cc|0;B21|B21|146a6b|0;B22|B22|0b3c43|0;B23|B23|303921|0;B24|B24|eefca5|0;B25|B25|4e846d|0;B26|B26|8c7a36|0;B27|B27|d1dcc1|0;B28|B28|9ee5b9|0;B29|B29|c5e254|0;B3|B3|7cee9d|0;B30|B30|ecfbd0|0;B31|B31|c4e6b5|0;B32|B32|9bab5a|0;B4|B4|1ef942|0;B5|B5|00bd35|0;B6|B6|5ae8ba|0;B7|B7|03ac88|0;B8|B8|029d26|0;B9|B9|26523a|0;C1|C1|e8ffe7|0;C10|C10|3ebce2|0;C11|C11|03b9b9|0;C12|C12|1c334d|0;C13|C13|cde8ff|0;C14|C14|d5fdff|0;C15|C15|23c4c6|0;C16|C16|1757a8|0;C17|C17|50d3ec|0;C18|C18|1c3344|0;C19|C19|1787a2|0;C2|C2|bcf9f6|0;C20|C20|0082be|0;C21|C21|beddff|0;C22|C22|67b4be|0;C23|C23|c2dceb|0;C24|C24|7dc4ff|0;C25|C25|a9e5e5|0;C26|C26|2f99b3|0;C27|C27|ebf5fc|0;C28|C28|bbcfed|0;C29|C29|4b5ba3|0;C3|C3|a0e2fb|0;C4|C4|42ccff|0;C5|C5|01aceb|0;C6|C6|50a9f0|0;C7|C7|0188d3|0;C8|C8|1054c0|0;C9|C9|314bca|0;D1|D1|aeb4f2|0;D10|D10|361b50|0;D11|D11|b9bae1|0;D12|D12|de9ad4|0;D13|D13|b90295|0;D14|D14|8b279b|0;D15|D15|2f1f90|0;D16|D16|e2e1ee|0;D17|D17|c4d4f6|0;D18|D18|a45ec7|0;D19|D19|d8c3d7|0;D2|D2|858edd|0;D20|D20|9c32b2|0;D21|D21|9a009b|0;D22|D22|333995|0;D23|D23|eadafc|0;D24|D24|7786e5|0;D25|D25|484fc7|0;D26|D26|e9c3f6|0;D3|D3|3054af|0;D4|D4|182a84|0;D5|D5|b843c5|0;D6|D6|ac7bde|0;D7|D7|6e399a|0;D8|D8|e2d3ff|0;D9|D9|d5b9f8|0;E1|E1|fdd3cc|0;E10|E10|d33893|0;E11|E11|fcddd2|0;E12|E12|ffa1c5|0;E13|E13|b6006d|0;E14|E14|ffd1ba|0;E15|E15|f2cfd0|0;E16|E16|ffecde|0;E17|E17|ffe2ea|0;E18|E18|ffc9d6|0;E19|E19|ffd2e7|0;E2|E2|fecddf|0;E20|E20|d8c7d1|0;E21|E21|bd9da1|0;E22|E22|cc78a7|0;E23|E23|937a8d|0;E24|E24|f6e4f9|0;E3|E3|ff97c3|0;E4|E4|e8649e|0;E5|E5|f551a2|0;E6|E6|ff346b|0;E7|E7|c63578|0;E8|E8|ffdbe9|0;E9|E9|e970cc|0;F1|F1|fd957b|0;F10|F10|a74d22|0;F11|F11|6f201f|0;F12|F12|fd4d6a|0;F13|F13|dd422f|0;F14|F14|ffa9ad|0;F15|F15|c80020|0;F16|F16|ffd9c8|0;F17|F17|f79b71|0;F18|F18|d37c46|0;F19|F19|c1444a|0;F2|F2|fc3d45|0;F20|F20|cd9391|0;F21|F21|f4b1b4|0;F22|F22|ffd0cb|0;F23|F23|f57e66|0;F24|F24|fcc1c4|0;F25|F25|e54b4f|0;F3|F3|f74941|0;F4|F4|fc283c|0;F5|F5|d80127|0;F6|F6|b0443d|0;F7|F7|971937|0;F8|F8|bc0127|0;F9|F9|e2677a|0;G1|G1|ffe2ce|0;G10|G10|c88135|0;G11|G11|e0c593|0;G12|G12|ebbb83|0;G13|G13|b7714a|0;G14|G14|8d614c|0;G15|G15|fcf9e0|0;G16|G16|f2d9ba|0;G17|G17|56403c|0;G18|G18|ffe4cc|0;G19|G19|e1943a|0;G2|G2|ffcaaa|0;G20|G20|a94023|0;G21|G21|cb8e77|0;G3|G3|f4c3a5|0;G4|G4|e1b383|0;G5|G5|ed9435|0;G6|G6|f59734|0;G7|G7|9d5b3e|0;G8|G8|592a21|0;G9|G9|e6b483|0;H1|H1|e2e2e2|0;H10|H10|eee9ea|0;H11|H11|cecdd5|0;H12|H12|fff5ed|0;H13|H13|f3e1c9|0;H14|H14|cfd7d3|0;H15|H15|98a6a8|0;H16|H16|3b2f23|0;H17|H17|f1eded|0;H18|H18|fffdf0|0;H19|H19|f6efe2|0;H2|H2|ffffff|0;H20|H20|949fa3|0;H21|H21|f7f3e4|0;H22|H22|cacad5|0;H23|H23|9a9d94|0;H3|H3|b3b3b3|0;H4|H4|868686|0;H5|H5|474747|0;H6|H6|2c2c2c|0;H7|H7|000000|0;H8|H8|e7d6db|0;H9|H9|e4e7e3|0;M1|M1|bcc6b8|0;M10|M10|c5b1bc|0;M11|M11|9f7494|0;M12|M12|644749|0;M13|M13|d19066|0;M14|M14|c77361|0;M15|M15|757d7b|0;M2|M2|8aa385|0;M3|M3|697d80|0;M4|M4|dacebe|0;M5|M5|d0ccaa|0;M6|M6|b0a782|0;M7|M7|b4a497|0;M8|M8|b38281|0;M9|M9|a58767|0;P1|P1|fcf8f9|0;P10|P10|d5c8e9|0;P11|P11|f3ecc8|0;P12|P12|e6eef1|0;P13|P13|a9cbf1|0;P14|P14|3177b0|0;P15|P15|668575|0;P16|P16|ffbe46|0;P17|P17|ffa324|0;P18|P18|feb89f|0;P19|P19|ffe0e8|0;P2|P2|bda9ab|0;P20|P20|febecf|0;P21|P21|ecbec0|0;P22|P22|e4a89e|0;P23|P23|a56269|0;P3|P3|aedda9|0;P4|P4|fda49e|0;P5|P5|ec8d3d|0;P6|P6|60cfa8|0;P7|P7|eb9271|0;P8|P8|f0d958|0;P9|P9|d9d9d9|0;Q1|Q1|f2a5e8|0;Q2|Q2|73b29e|0;Q3|Q3|ffff00|0;Q4|Q4|ffebfa|0;Q5|Q5|4f5e5b|0;R1|R1|d50e21|0;R10|R10|ffdb4d|0;R11|R11|ffebfa|0;R12|R12|d8d5ce|0;R13|R13|55514c|0;R14|R14|9ee4df|0;R15|R15|77cee9|0;R16|R16|3dcfca|0;R17|R17|4a867a|0;R18|R18|7fcd9d|0;R19|R19|cde55d|0;R2|R2|f92e83|0;R20|R20|e8c7b4|0;R21|R21|ad6f3c|0;R22|R22|6c372f|0;R23|R23|feb872|0;R24|R24|f2c1c0|0;R25|R25|c9675d|0;R26|R26|d293be|0;R27|R27|ea8cb1|0;R28|R28|9c87d6|0;R3|R3|fd8225|0;R4|R4|f8ec31|0;R5|R5|34c75b|0;R6|R6|25b891|0;R7|R7|17779d|0;R8|R8|1b60c3|0;R9|R9|9a56b4|0;T1|T1|e2dfd7|0;Y1|Y1|fd6fb4|0;Y2|Y2|feb481|0;Y3|Y3|d7faa0|0;Y4|Y4|8bdbfa|0;Y5|Y5|e987ea|0;ZG1|ZG1|daabb3|0;ZG2|ZG2|d6aa87|0;ZG3|ZG3|c1bd8d|0;ZG4|ZG4|96869f|0;ZG5|ZG5|8490a6|0;ZG6|ZG6|94bfe2|0;ZG7|ZG7|e2a9d2|0;ZG8|ZG8|ab91c0|0"},{"id":"hama_mini","name":"하마 미니","size":"2.5mm","pitch":0.25,"c":"H01|White|e5ecf1|0;H02|Cream|e4e4c5|0;H03|Yellow|e9c704|0;H04|Orange|d14803|0;H05|Red|b4060e|0;H06|Pink|ea8aa5|0;H07|Purple|712297|0;H08|Blue|0239a3|0;H09|Light Blue|025bc3|0;H10|Green|027643|0;H11|Light Green|19cda7|0;H12|Brown|3e271a|0;H13|Transparent Red|c02435|1;H14|Transparent Yellow|e4aa32|1;H15|Transparent Blue|487ed5|1;H16|Transparent Green|37b876|1;H17|Grey|838f98|0;H18|Black|141315|0;H19|Clear|d8d2ce|1;H20|Reddish Brown|8d2a0f|0;H21|Light Brown|be6c21|0;H22|Dark Red|91020a|0;H24|Translucent Purple|683e9a|1;H26|Matt Rose|e8a498|0;H27|Beige|dcb18e|0;H28|Dark Green|1e2c1c|0;H29|Claret|bf0142|0;H30|Burgundy|4e0c1b|0;H31|Turquoise|489ab9|0;H32|Neon Fuchsia|ff208d|1;H33|Cerise|ff3956|0;H34|Neon Yellow|e5ef13|1;H35|Neon Red|ff2833|1;H36|Neon Blue|2353b0|1;H37|Neon Green|06b73c|1;H38|Neon Orange|fd8600|1;H42|Fluorescent Green|0cbd51|1;H43|Pastel Yellow|e7e45a|0;H44|Pastel Red|f96160|0;H45|Pastel Purple|8e69cd|0;H46|Pastel Blue|51aee4|0;H47|Pastel Green|80df96|0;H48|Pastel Pink|d67ad1|0;H49|Azure|0facd1|0;H60|Teddybear Brown|f0981e|0;H70|Light Grey|a5b3c0|0;H71|Dark Grey|445059|0;H75|Tan|b78c6d|0;H76|Nougat|8a5937|0;H77|Cloudy White|ced1c8|0;H78|Light Peach|f7c1aa|0;H79|Apricot|f87633|0;H82|Plum|91175a|0;H83|Petrol Blue|037a9f|0;H84|Olive Green|687836|0;H95|Pastel Rose|dd9ba3|0;H96|Pastel Lilac|b491ad|0;H97|Pastel Ice Blue|8aafc2|0;H98|Pastel Mint|94cca4|0;H101|Eucalyptus|a9c39b|0;H102|Forest Green|356b2d|0;H103|Light Yellow|ffe660|0;H104|Lime|bcd122|0;H105|Light Apricot|ffac78|0;H106|Light Lavender|ccc5ed|0;H107|Lavender|6a87c1|0;H108|Aubergine|2a2536|0;H109|Cloudy Grey|8a847f|0;H110|Matcha|838956|0;H111|Dark Blush|835854|0;H112|Blush|ad8a82|0;H113|Aqua|5f887b|0;H114|Cherry Red|9a2c31|0;H115|Bright Green|6e975f|0;H116|Midnight Blue|222838|0;H117|Taupe Grey|777169|0;H118|Maroon Red|612932|0;H119|Sky Blue|4167b4|0"}];
+(()=>{
+const $=s=>document.querySelector(s);
+function lab(r,g,b){
+  [r,g,b]=[r,g,b].map(v=>{v/=255;return v>.04045?Math.pow((v+.055)/1.055,2.4):v/12.92});
+  let x=(r*.4124+g*.3576+b*.1805)/.95047,y=r*.2126+g*.7152+b*.0722,z=(r*.0193+g*.1192+b*.9505)/1.08883;
+  const f=t=>t>.008856?Math.cbrt(t):7.787*t+16/116;x=f(x);y=f(y);z=f(z);return[116*y-16,500*(x-y),200*(y-z)];
+}
+const d2=(a,b)=>(a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2;
+const hexRgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+
+/* ---------- palettes ---------- */
+const CACHE={};
+function palette(id){
+  if(CACHE[id])return CACHE[id];
+  const b=BRANDS.find(x=>x.id===id);
+  const list=b.c.split(";").map(s=>{const[code,name,hx,sp]=s.split("|");const hex="#"+hx,rgb=hexRgb(hex);return{code,name,hex,rgb,lab:lab(...rgb),sp:sp==="1"}});
+  const auto=list.map((_,i)=>i).filter(i=>!list[i].sp);
+  const order=list.map((p,i)=>{const[r,g,b]=p.rgb.map(v=>v/255),mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,s=mx===mn?0:(mx-mn)/(1-Math.abs(2*l-1));
+    let h=0;if(mx!==mn){h=mx===r?((g-b)/(mx-mn))%6:mx===g?(b-r)/(mx-mn)+2:(r-g)/(mx-mn)+4;h=(h*60+360)%360}
+    return{i,k:s<.14?1000+(1-l)*100:Math.floor(h/24)*10+(1-l)*9}}).sort((a,b)=>a.k-b.k).map(o=>o.i);
+  return CACHE[id]={...b,list,auto,order};
+}
+let B; // current brand
+const P=()=>B.list;
+function nearest(l,allowed){let best=-1,bd=1e12;for(const i of allowed){const d=d2(l,B.list[i].lab);if(d<bd){bd=d;best=i}}return best}
+const nearHex=h=>nearest(lab(...hexRgb(h)),B.auto);
+
+/* ---------- templates (colors as hex, matched to the chosen brand) ---------- */
+const TPL={
+  heart:{name:"하트",map:{R:"#D7263D",W:"#F7F7F2"},rows:["..RR...RR..",".RRRR.RRRR.","RRRRRRRRRRR","RRWRRRRRRRR","RWRRRRRRRRR",".RRRRRRRRR.","..RRRRRRR..","...RRRRR...","....RRR....",".....R....."]},
+  berry:{name:"딸기",map:{R:"#D7263D",G:"#2E9B4F",Y:"#F7D23E"},rows:["....GGG....","..GGGGGGG..",".RRRGGGRRR.","RRRRRRRRRRR","RYRRRYRRRYR","RRRRRRRRRRR",".RRYRRRYRR.",".RRRRRRRRR.","..RYRRRYR..","...RRRRR...","....RRR....",".....R....."]},
+  smile:{name:"스마일",map:{Y:"#F7D23E",K:"#1B1B1E",P:"#F49AC1"},rows:["....YYYY....","..YYYYYYYY..",".YYYYYYYYYY.",".YYKYYYYKYY.","YYYKYYYYKYYY","YYYYYYYYYYYY","YPYYYYYYYYPY","YYKYYYYYYKYY",".YYKKYYKKYY.",".YYYYKKYYYY.","..YYYYYYYY..","....YYYY...."]},
+  flower:{name:"꽃",map:{P:"#F49AC1",Y:"#F7D23E",G:"#2E9B4F"},rows:["...PP.PP...","..PPPPPPP..",".PPPPPPPPP.",".PPPYYYPPP.","..PPYYYPP..",".PPPYYYPPP.",".PPPPPPPPP.","..PPPPPPP..","...PP.PP...",".....G.....","...GGG.GG..","....GGG...."]},
+  cat:{name:"고양이",map:{K:"#2A2A2E",Y:"#F7D23E",P:"#F49AC1",W:"#F7F7F2"},rows:["K.........K","KK.......KK","KKKKKKKKKKK","KKKKKKKKKKK","KKYKKKKKYKK","KKYKKKKKYKK","KKKKKPKKKKK","WKKKKKKKKKW","KKKKWKWKKKK",".KKKKKKKKK.","..KKKKKKK.."]},
+  clover:{name:"네잎클로버",map:{G:"#2E9B4F",D:"#1D5B3A",L:"#A8D65A"},rows:["..GGG.GGG..",".GGLGGGLGG.",".GGGGDGGGG.","..GGGDGGG..","GGGGDDDGGGG","GLGDDDDDGLG","GGGGDDDGGGG","..GGGDGGG..",".GGGGDGGGG.",".GGLG.DLGG.","..GGG..D...","........D.."]},
+};
+
+const st={mode:"template",tpl:"heart",w:11,h:10,cells:[],mask:null,tool:null,brush:0,focus:null,
+  brand:"artkal_s",shape:"square",boardN:29,roundD:29,guides:true,nums:false,
+  img:null,marks:[],markMode:"bg",imgW:29,maxColors:10,bgTol:14,crop:true,clean:true,outline:false,text:"LOVE",textH:10,textHex:"#D7263D",cs:24};
+try{const s=JSON.parse(localStorage.getItem("beadmaker2")||"{}");if(s.brand&&BRANDS.some(b=>b.id===s.brand))st.brand=s.brand}catch(e){}
+const save=()=>{try{localStorage.setItem("beadmaker2",JSON.stringify({brand:st.brand}))}catch(e){}};
+B=palette(st.brand);
+
+/* ---------- content generators: each returns {w,h,cells} ---------- */
+function genTemplate(){const t=TPL[st.tpl],h=t.rows.length,w=Math.max(...t.rows.map(r=>r.length)),idx={};
+  for(const k in t.map)idx[k]=nearHex(t.map[k]);
+  const cells=[];for(const r of t.rows)for(let x=0;x<w;x++){const c=r[x];cells.push(c&&c!=="."?idx[c]:-1)}return{w,h,cells}}
+
+function downscale(src,w,h){
+  let c=src,cw=src.width,ch=src.height;
+  while(cw/2>w&&ch/2>h){const n=document.createElement("canvas");n.width=Math.ceil(cw/2);n.height=Math.ceil(ch/2);const nx=n.getContext("2d");nx.imageSmoothingQuality="high";nx.drawImage(c,0,0,n.width,n.height);c=n;cw=n.width;ch=n.height}
+  const o=document.createElement("canvas");o.width=w;o.height=h;const ox=o.getContext("2d",{willReadFrequently:true});ox.imageSmoothingQuality="high";ox.drawImage(c,0,0,w,h);
+  return ox.getImageData(0,0,w,h).data;
+}
+function kmeans(pts,k){
+  if(pts.length<=k)return pts.slice();
+  let c=[];for(let i=0;i<k;i++)c.push(pts[Math.floor((i+.5)*pts.length/k)].slice());
+  for(let it=0;it<10;it++){const s=c.map(()=>[0,0,0,0]);
+    for(const p of pts){let bi=0,bd=1e12;c.forEach((q,j)=>{const d=d2(p,q);if(d<bd){bd=d;bi=j}});const t=s[bi];t[0]+=p[0];t[1]+=p[1];t[2]+=p[2];t[3]++}
+    c=c.map((q,j)=>s[j][3]?[s[j][0]/s[j][3],s[j][1]/s[j][3],s[j][2]/s[j][3]]:q)}
+  return c;
+}
+let workCanvas=null,base=null;
+function prepBase(){const im=st.img,sc=Math.min(1,480/Math.max(im.naturalWidth,im.naturalHeight)),W=Math.max(1,Math.round(im.naturalWidth*sc)),H=Math.max(1,Math.round(im.naturalHeight*sc));
+  const cv=document.createElement("canvas");cv.width=W;cv.height=H;const cx=cv.getContext("2d",{willReadFrequently:true});cx.drawImage(im,0,0,W,H);
+  const data=cx.getImageData(0,0,W,H).data,L=new Array(W*H);for(let i=0;i<W*H;i++)L[i]=lab(data[i*4],data[i*4+1],data[i*4+2]);
+  base={cv,W,H,data,L}}
+// region growing: from seeds, accept pixels close to a reference colour, stepping only across small colour changes
+function grow(seeds,refs,tol,out,block){
+  const{W,H,L,data}=base,T=tol*tol,Ts=(tol*.7)**2,seen=new Uint8Array(W*H);
+  const near=l=>{let m=1e12;for(const c of refs){const v=d2(l,c);if(v<m)m=v}return m};
+  const q=[];for(const s of seeds){if(seen[s]||(block&&block[s]))continue;seen[s]=1;if(data[s*4+3]<128||near(L[s])<T){out[s]=1;q.push(s)}}
+  for(let k=0;k<q.length;k++){const i=q[k],x=i%W,y=(i/W)|0;
+    for(const j of[x>0?i-1:-1,x<W-1?i+1:-1,y>0?i-W:-1,y<H-1?i+W:-1]){if(j<0||seen[j]||(block&&block[j]))continue;seen[j]=1;
+      if(data[j*4+3]<128||(near(L[j])<T&&d2(L[j],L[i])<Ts)){out[j]=1;q.push(j)}}}
+}
+function genPhoto(){
+  if(!st.img)return null;if(!base)prepBase();
+  const{W,H,L}=base,N=W*H,bg=new Uint8Array(N),keep=new Uint8Array(N);
+  const cv=document.createElement("canvas");cv.width=W;cv.height=H;const cx=cv.getContext("2d",{willReadFrequently:true});
+  const id=cx.createImageData(W,H),d=id.data;d.set(base.data);
+  for(let i=0;i<N;i++)if(d[i*4+3]<128)bg[i]=1;
+  const tol=st.bgTol||16,px=m=>Math.min(H-1,Math.floor(m.y*H))*W+Math.min(W-1,Math.floor(m.x*W));
+  for(const m of st.marks)if(m.m==="keep"){const s=px(m);grow([s],[L[s]],tol,keep)}
+  if(st.bgTol>0){
+    const border=[],step=Math.max(1,Math.floor((W+H)/400));
+    for(let x=0;x<W;x+=step){border.push(x,(H-1)*W+x)}for(let y=0;y<H;y+=step){border.push(y*W,y*W+W-1)}
+    const centers=kmeans(border.filter(i=>!bg[i]).map(i=>L[i]),4),all=[];
+    for(let x=0;x<W;x++){all.push(x,(H-1)*W+x)}for(let y=0;y<H;y++){all.push(y*W,y*W+W-1)}
+    grow(all,centers,st.bgTol,bg,keep);
+  }
+  for(const m of st.marks)if(m.m==="bg"){const s=px(m);if(!keep[s])grow([s],[L[s]],tol,bg,keep)}
+  // close pinholes: a pixel whose 4 neighbours are all background becomes background
+  for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){const i=y*W+x;if(!bg[i]&&!keep[i]&&bg[i-1]&&bg[i+1]&&bg[i-W]&&bg[i+W])bg[i]=1}
+  let x0=0,y0=0,x1=W-1,y1=H-1;
+  for(let i=0;i<N;i++)if(bg[i])d[i*4+3]=0;
+  if(st.crop){x0=W;y0=H;x1=-1;y1=-1;for(let i=0;i<N;i++)if(!bg[i]){const x=i%W,y=(i/W)|0;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+    if(x1<0){x0=0;y0=0;x1=W-1;y1=H-1}}
+  cx.putImageData(id,0,0);workCanvas=cv;drawThumb();
+  const cw=x1-x0+1,ch=y1-y0+1,crop=document.createElement("canvas");crop.width=cw;crop.height=ch;crop.getContext("2d").drawImage(cv,x0,y0,cw,ch,0,0,cw,ch);
+  const rd=Math.round(st.roundD*.82),lim=st.shape==="round"?rd:200,maxW=Math.min(st.imgW,lim),maxH=st.shape==="round"?rd:100;
+  let w=maxW,h=Math.max(1,Math.round(ch/cw*w));if(h>maxH){h=maxH;w=Math.max(1,Math.round(cw/ch*h))}
+  const s=downscale(crop,w,h),labs=[];
+  for(let i=0;i<w*h;i++)labs.push(s[i*4+3]<120?null:lab(s[i*4],s[i*4+1],s[i*4+2]));
+  let cells=quantize(labs,st.maxColors);
+  if(st.clean){cells=despeckle(cells,w,h);cells=dropSmall(cells,w,h,3)}
+  return{w,h,cells};
+}
+// pick k representative colours from the picture first (farthest-point seeding keeps small accents like a beak or cheeks),
+// then map each representative to the nearest bead colour that is actually sold
+function quantize(labs,k){
+  const idx=[];labs.forEach((l,i)=>{if(l)idx.push(i)});if(!idx.length)return labs.map(()=>-1);
+  const pts=idx.map(i=>labs[i]);
+  const mean=[0,1,2].map(j=>pts.reduce((s,p)=>s+p[j],0)/pts.length);
+  let c=[pts.reduce((b,p)=>d2(p,mean)<d2(b,mean)?p:b,pts[0]).slice()];
+  const dist=pts.map(p=>d2(p,c[0]));
+  while(c.length<Math.min(k,pts.length)){let bi=0;for(let i=1;i<pts.length;i++)if(dist[i]>dist[bi])bi=i;if(dist[bi]<4)break;c.push(pts[bi].slice());pts.forEach((p,i)=>{const v=d2(p,c[c.length-1]);if(v<dist[i])dist[i]=v})}
+  let asg=new Array(pts.length).fill(0);
+  for(let it=0;it<8;it++){const s=c.map(()=>[0,0,0,0]);
+    pts.forEach((p,i)=>{let bi=0,bd=1e12;c.forEach((q,j)=>{const v=d2(p,q);if(v<bd){bd=v;bi=j}});asg[i]=bi;const t=s[bi];t[0]+=p[0];t[1]+=p[1];t[2]+=p[2];t[3]++});
+    c=c.map((q,j)=>s[j][3]?[s[j][0]/s[j][3],s[j][1]/s[j][3],s[j][2]/s[j][3]]:q)}
+  const bead=c.map(q=>nearest(q,B.auto)),out=labs.map(()=>-1);
+  idx.forEach((i,n)=>out[i]=bead[asg[n]]);return out;
+}
+function despeckle(c,w,h){const o=c.slice();
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x;if(c[i]<0)continue;const tally={};let same=0,filled=0;
+    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;const X=x+dx,Y=y+dy;if(X<0||Y<0||X>=w||Y>=h)continue;const v=c[Y*w+X];if(v<0)continue;filled++;if(v===c[i])same++;tally[v]=(tally[v]||0)+1}
+    if(same===0&&filled>=3){let bv=-1,bn=0;for(const k in tally)if(tally[k]>bn){bn=tally[k];bv=+k}if(bn>=3)o[i]=bv}}
+  return o}
+function dropSmall(c,w,h,min){const seen=new Uint8Array(w*h),o=c.slice();
+  for(let s=0;s<w*h;s++){if(seen[s]||c[s]<0)continue;const comp=[s];seen[s]=1;for(let k=0;k<comp.length;k++){const i=comp[k],x=i%w,y=(i/w)|0;
+    for(const j of[x>0?i-1:-1,x<w-1?i+1:-1,y>0?i-w:-1,y<h-1?i+w:-1])if(j>=0&&!seen[j]&&c[j]>=0){seen[j]=1;comp.push(j)}}
+    if(comp.length<min)comp.forEach(i=>o[i]=-1)}
+  return o}
+async function genText(){
+  const t=(st.text||"").trim()||"A";
+  try{await document.fonts.load('200px "Do Hyeon"')}catch(e){}
+  const big=document.createElement("canvas");big.width=Math.max(400,t.length*260);big.height=320;
+  const bx=big.getContext("2d",{willReadFrequently:true});bx.font='200px "Do Hyeon","IBM Plex Sans KR",sans-serif';bx.textBaseline="middle";bx.fillText(t,30,160);
+  const d=bx.getImageData(0,0,big.width,big.height).data;let x0=1e9,y0=1e9,x1=-1,y1=-1;
+  for(let y=0;y<big.height;y++)for(let x=0;x<big.width;x++)if(d[(y*big.width+x)*4+3]>40){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  if(x1<0)return{w:3,h:3,cells:new Array(9).fill(-1)};
+  const bw=x1-x0+1,bh=y1-y0+1,H=st.textH,W=Math.min(100,Math.max(1,Math.round(bw*H/bh)));
+  const crop=document.createElement("canvas");crop.width=bw;crop.height=bh;crop.getContext("2d").drawImage(big,x0,y0,bw,bh,0,0,bw,bh);
+  const s=downscale(crop,W,H),col=nearHex(st.textHex),w=W+2,h=H+2,cells=new Array(w*h).fill(-1);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(s[(y*W+x)*4+3]>105)cells[(y+1)*w+x+1]=col;
+  return{w,h,cells};
+}
+function addOutline(g){const w=g.w+2,h=g.h+2,c=new Array(w*h).fill(-1),k=nearHex("#1B1B1E");
+  for(let y=0;y<g.h;y++)for(let x=0;x<g.w;x++)c[(y+1)*w+x+1]=g.cells[y*g.w+x];
+  const o=c.slice();for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x;if(c[i]>=0)continue;
+    if((x>0&&c[i-1]>=0)||(x<w-1&&c[i+1]>=0)||(y>0&&c[i-w]>=0)||(y<h-1&&c[i+w]>=0))o[i]=k}
+  return{w,h,cells:o}}
+function compose(g){
+  if(st.shape!=="round"){st.w=g.w;st.h=g.h;st.cells=g.cells;st.mask=null;return}
+  const D=st.roundD,c=new Array(D*D).fill(-1),m=new Uint8Array(D*D),ox=Math.floor((D-g.w)/2),oy=Math.floor((D-g.h)/2),r=D/2;
+  for(let y=0;y<D;y++)for(let x=0;x<D;x++){const inside=(x+.5-r)**2+(y+.5-r)**2<=r*r;m[y*D+x]=inside?1:0;
+    const gx=x-ox,gy=y-oy;if(inside&&gx>=0&&gy>=0&&gx<g.w&&gy<g.h)c[y*D+x]=g.cells[gy*g.w+gx]}
+  st.w=D;st.h=D;st.cells=c;st.mask=m;
+}
+async function regenerate(){
+  pushUndo();
+  let g=st.mode==="template"?genTemplate():st.mode==="photo"?genPhoto():await genText();
+  if(!g){g=genTemplate()}
+  if(st.outline&&st.mode==="photo")g=addOutline(g);
+  compose(g);st.focus=null;render();
+}
+
+/* ---------- undo ---------- */
+const undo=[];
+function pushUndo(){if(st.cells.length){undo.push({w:st.w,h:st.h,cells:st.cells.slice(),mask:st.mask&&st.mask.slice()});if(undo.length>40)undo.shift()}$("#undoBtn").disabled=!undo.length}
+function doUndo(){const u=undo.pop();if(!u)return;Object.assign(st,u);$("#undoBtn").disabled=!undo.length;render()}
+$("#undoBtn").addEventListener("click",doUndo);
+document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();doUndo()}});
+
+/* ---------- drawing ---------- */
+const tok=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const shade=(rgb,k)=>`rgb(${rgb.map(v=>Math.round(v*k)).join(",")})`;
+function legendList(){const c={};st.cells.forEach(v=>{if(v>=0)c[v]=(c[v]||0)+1});return Object.keys(c).map(Number).sort((a,b)=>c[b]-c[a]).map((i,k)=>({i,n:c[i],no:k+1}))}
+function drawBoard(ctx,cs,o){
+  const{w,h,cells,mask}=st,round=!!mask,list=o.list,no={};list.forEach(r=>no[r.i]=r.no);
+  ctx.fillStyle=o.well;ctx.fillRect(0,0,w*cs,h*cs);
+  ctx.fillStyle=o.peg;
+  if(round){ctx.beginPath();ctx.arc(w*cs/2,h*cs/2,w*cs/2,0,7);ctx.fill()}else ctx.fillRect(0,0,w*cs,h*cs);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const i=y*w+x;if(mask&&!mask[i])continue;const c=cells[i],cx=x*cs+cs/2,cy=y*cs+cs/2;
+    if(c<0){ctx.fillStyle=o.dot;ctx.beginPath();ctx.arc(cx,cy,Math.max(1,cs*.09),0,7);ctx.fill();continue}
+    const p=B.list[c];ctx.globalAlpha=o.focus!=null&&o.focus!==c?.18:1;
+    ctx.fillStyle=p.hex;ctx.beginPath();ctx.arc(cx,cy,cs*.46,0,7);ctx.fill();
+    ctx.lineWidth=Math.max(1,cs*.06);ctx.strokeStyle=shade(p.rgb,.78);ctx.beginPath();ctx.arc(cx,cy,cs*.43,0,7);ctx.stroke();
+    if(o.nums&&cs>=15){ctx.fillStyle=p.lab[0]>62?"#1A2030":"#FFFFFF";ctx.font=`600 ${Math.round(cs*(no[c]>9?.38:.46))}px "IBM Plex Mono",monospace`;ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(no[c],cx,cy+.5)}
+    else{ctx.fillStyle=o.peg;ctx.beginPath();ctx.arc(cx,cy,cs*.15,0,7);ctx.fill()}
+    ctx.globalAlpha=1;
+  }
+  const line=(x0,y0,x1,y1)=>{ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke()};
+  if(round){ctx.save();ctx.beginPath();ctx.arc(w*cs/2,h*cs/2,w*cs/2,0,7);ctx.clip()}
+  if(o.guides){ctx.strokeStyle=o.guide;ctx.globalAlpha=.5;
+    for(let x=5;x<w;x+=5){ctx.lineWidth=x%10?1:1.8;line(x*cs,0,x*cs,h*cs)}
+    for(let y=5;y<h;y+=5){ctx.lineWidth=y%10?1:1.8;line(0,y*cs,w*cs,y*cs)}ctx.globalAlpha=1}
+  if(round){ctx.restore();ctx.strokeStyle=o.board;ctx.lineWidth=2;ctx.beginPath();ctx.arc(w*cs/2,h*cs/2,w*cs/2-1,0,7);ctx.stroke()}
+  else{const n=st.boardN;ctx.strokeStyle=o.board;ctx.lineWidth=2.5;ctx.setLineDash([cs*.6,cs*.4]);
+    for(let x=n;x<w;x+=n)line(x*cs,0,x*cs,h*cs);for(let y=n;y<h;y+=n)line(0,y*cs,w*cs,y*cs);ctx.setLineDash([])}
+}
+function themeColors(){return{well:tok("--well"),peg:tok("--peg"),dot:tok("--peg-dot"),guide:tok("--guide"),board:tok("--boardline")}}
+function renderBoard(){
+  const cv=$("#board"),wrap=$("#boardWrap");
+  st.cs=Math.max(10,Math.min(30,Math.floor((wrap.clientWidth-18)/st.w)));
+  const dpr=window.devicePixelRatio||1,W=st.cs*st.w,H=st.cs*st.h;
+  cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+"px";cv.style.height=H+"px";
+  const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+  drawBoard(ctx,st.cs,{...themeColors(),guides:st.guides,nums:st.nums,focus:st.focus,list:legendList()});
+}
+const fmt=n=>n.toLocaleString("ko-KR");
+function sizeInfo(){const p=B.pitch;return{wcm:(st.w*p).toFixed(1),hcm:(st.h*p).toFixed(1)}}
+function boardsNeeded(){if(st.mask)return 1;const n=st.boardN;return Math.ceil(st.w/n)*Math.ceil(st.h/n)}
+function renderInfo(){
+  const list=legendList(),total=list.reduce((s,r)=>s+r.n,0),sz=sizeInfo();
+  $("#stats").innerHTML=[[`${st.w}×${st.h}`,"칸"],[`${sz.wcm}×${sz.hcm}cm`,"완성 크기"],[fmt(total),"구슬 개수"],[list.length,"사용 색"],[st.mask?"원형 1장":`${boardsNeeded()}장`,"필요한 판"]]
+    .map(([b,l])=>`<div class="stat"><b>${b}</b><span>${l}</span></div>`).join("");
+  $("#total").textContent=`총 ${fmt(total)}개`;
+  $("#legendBody").innerHTML=list.map(r=>{const p=B.list[r.i];return`<tr data-i="${r.i}" class="${st.focus===r.i?"on":""}"><td class="no">${r.no}</td><td><span class="dot" style="--c:${p.hex}"></span><span class="code">${p.code}</span><span class="cname">${p.name}</span></td><td class="n">${fmt(r.n)}</td></tr>`}).join("")||`<tr><td colspan="3" style="color:var(--muted)">아직 놓인 구슬이 없어요</td></tr>`;
+  $("#swapBtn").disabled=st.focus==null||st.focus===st.brush;
+}
+const render=()=>{renderBoard();renderInfo()};
+
+/* ---------- brush & palette ---------- */
+function buildPalette(){
+  const el=$("#palette");el.innerHTML="";$("#palCount").textContent=B.list.length;
+  B.order.forEach(i=>{const p=B.list[i],b=document.createElement("button");b.className="sw";b.style.setProperty("--c",p.hex);b.title=`${p.code} ${p.name}${p.sp?" (특수 마감)":""}`;b.setAttribute("aria-label",b.title);b.dataset.i=i;b.setAttribute("aria-pressed",i===st.brush);el.append(b)});
+}
+function setBrush(i,note){st.brush=i;const p=B.list[i];
+  $("#curDot").style.setProperty("--c",p.hex);
+  $("#curText").innerHTML=`<b>${p.code}</b> ${p.name}<small>${B.name} ${B.size} · 붓 색</small>`;
+  $("#palette").querySelectorAll(".sw").forEach(s=>s.setAttribute("aria-pressed",+s.dataset.i===i));
+  if(note!==undefined)$("#matchNote").textContent=note;
+  renderInfo();
+}
+$("#palette").addEventListener("click",e=>{const b=e.target.closest(".sw");if(b){setBrush(+b.dataset.i);if(!st.tool)setTool("paint")}});
+function matchHex(h){
+  if(!/^#[0-9a-fA-F]{6}$/.test(h))return toast("#FF8800처럼 # 뒤에 6자리로 입력해 주세요");
+  const l=lab(...hexRgb(h)),i=nearest(l,B.auto),dE=Math.sqrt(d2(l,B.list[i].lab));
+  const q=dE<5?"거의 같은 색":dE<12?"비슷한 색":"판매 색 중 가장 가까운 색 (차이가 있어요)";
+  $("#colorIn").value=h.toLowerCase();$("#hexIn").value=h.toUpperCase();
+  setBrush(i,`${h.toUpperCase()} → ${B.list[i].code} ${B.list[i].name}: ${q}`);if(!st.tool)setTool("paint");
+}
+$("#hexIn").addEventListener("change",e=>{let v=e.target.value.trim();if(!v.startsWith("#"))v="#"+v;matchHex(v)});
+$("#hexIn").addEventListener("keydown",e=>{if(e.key==="Enter")e.target.dispatchEvent(new Event("change"))});
+$("#colorIn").addEventListener("change",e=>matchHex(e.target.value));
+$("#eyeBtn").addEventListener("click",async()=>{
+  if(!("EyeDropper"in window))return toast("이 브라우저는 스포이드를 지원하지 않아요. PC 크롬·엣지에서 쓰거나 옆 색상 칸을 눌러 주세요");
+  try{const r=await new EyeDropper().open();matchHex(r.sRGBHex.length===7?r.sRGBHex:rgbToHex(r.sRGBHex))}
+  catch(e){if(e&&e.name!=="AbortError")toast("스포이드를 열 수 없었어요. 옆 색상 칸의 스포이드를 써 보세요")}
+});
+function rgbToHex(s){const m=s.match(/\d+/g);return m?"#"+m.slice(0,3).map(v=>(+v).toString(16).padStart(2,"0")).join(""):"#000000"}
+
+/* ---------- tools ---------- */
+const HINT={paint:"칸을 누르거나 끌어서 붓 색으로 칠해요",fill:"누른 칸과 이어진 같은 색 구슬을 붓 색으로 바꿔요",erase:"칸을 누르거나 끌어서 구슬을 빼요",wand:"누른 칸과 이어진 같은 색 덩어리를 한 번에 지워요. 남은 배경 정리에 좋아요",pick:"누른 구슬의 색을 붓에 담아요"};
+function setTool(t){st.tool=st.tool===t?null:t;
+  $("#toolbar").querySelectorAll("[data-t]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===st.tool));
+  $("#boardWrap").classList.toggle("active",!!st.tool);
+  $("#toolHint").textContent=st.tool?HINT[st.tool]:"도구를 고르면 판을 직접 고칠 수 있어요. 도구를 다시 누르면 꺼져요"}
+$("#toolbar").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b)setTool(b.dataset.t)});
+function cellAt(e){const r=$("#board").getBoundingClientRect(),x=Math.floor((e.clientX-r.left)/st.cs),y=Math.floor((e.clientY-r.top)/st.cs);
+  if(x<0||y<0||x>=st.w||y>=st.h)return-1;const i=y*st.w+x;if(st.mask&&!st.mask[i])return-1;return i}
+function flood(i,fn){const t=st.cells[i],w=st.w,h=st.h,seen=new Uint8Array(w*h),q=[i];seen[i]=1;
+  for(let k=0;k<q.length;k++){const j=q[k],x=j%w,y=(j/w)|0;fn(j);
+    for(const n of[x>0?j-1:-1,x<w-1?j+1:-1,y>0?j-w:-1,y<h-1?j+w:-1])if(n>=0&&!seen[n]&&st.cells[n]===t&&(!st.mask||st.mask[n])){seen[n]=1;q.push(n)}}}
+let drag=false;
+const cv=$("#board");
+cv.addEventListener("pointerdown",e=>{if(!st.tool)return;const i=cellAt(e);if(i<0)return;e.preventDefault();
+  if(st.tool==="pick"){const c=st.cells[i];if(c>=0){setBrush(c,`판에서 고른 색: ${B.list[c].code} ${B.list[c].name}`);setTool("paint")}return}
+  pushUndo();
+  if(st.tool==="fill"){if(st.cells[i]!==st.brush){const tmp=[];flood(i,j=>tmp.push(j));tmp.forEach(j=>st.cells[j]=st.brush)}render();return}
+  if(st.tool==="wand"){if(st.cells[i]>=0){const tmp=[];flood(i,j=>tmp.push(j));tmp.forEach(j=>st.cells[j]=-1)}render();return}
+  drag=true;try{cv.setPointerCapture(e.pointerId)}catch(_){}paintCell(i)});
+cv.addEventListener("pointermove",e=>{if(drag){const i=cellAt(e);if(i>=0)paintCell(i)}});
+function paintCell(i){const v=st.tool==="erase"?-1:st.brush;if(st.cells[i]!==v){st.cells[i]=v;renderBoard()}}
+const stop=()=>{if(drag){drag=false;render()}};
+cv.addEventListener("pointerup",stop);cv.addEventListener("pointercancel",stop);
+
+$("#legendBody").addEventListener("click",e=>{const tr=e.target.closest("tr[data-i]");if(!tr)return;const i=+tr.dataset.i;st.focus=st.focus===i?null:i;render()});
+$("#swapBtn").addEventListener("click",()=>{if(st.focus==null)return;pushUndo();const f=st.focus;st.cells=st.cells.map(c=>c===f?st.brush:c);st.focus=null;render();toast("색을 모두 바꿨어요")});
+
+/* ---------- controls ---------- */
+const tpls=$("#tplGrid");
+Object.entries(TPL).forEach(([k,t])=>{
+  const b=document.createElement("button");b.className="tpl";b.dataset.k=k;b.setAttribute("aria-pressed",k===st.tpl);
+  const c=document.createElement("canvas"),w=Math.max(...t.rows.map(r=>r.length)),h=t.rows.length,u=Math.floor(104/Math.max(w,h));
+  c.width=104;c.height=104;const x=c.getContext("2d"),ox=(104-w*u)/2,oy=(104-h*u)/2;
+  t.rows.forEach((r,yy)=>[...r].forEach((ch,xx)=>{if(ch!=="."){x.fillStyle=t.map[ch];x.beginPath();x.arc(ox+xx*u+u/2,oy+yy*u+u/2,u*.45,0,7);x.fill()}}));
+  b.append(c,document.createTextNode(t.name));tpls.append(b)});
+tpls.addEventListener("click",e=>{const b=e.target.closest(".tpl");if(!b)return;st.tpl=b.dataset.k;tpls.querySelectorAll(".tpl").forEach(t=>t.setAttribute("aria-pressed",t===b));regenerate()});
+
+const tabs=["template","photo","text"];
+tabs.forEach(m=>$("#tab-"+m).addEventListener("click",()=>{
+  st.mode=m;tabs.forEach(n=>{$("#tab-"+n).setAttribute("aria-selected",n===m);$("#panel-"+n).hidden=n!==m});
+  if(m!=="photo"||st.img)regenerate();
+}));
+
+function drawThumb(){if(!workCanvas||!base)return;$("#thumbRow").hidden=false;const t=$("#thumb"),W=base.W,H=base.H;
+  if(t.width!==W||t.height!==H){t.width=W;t.height=H}const x=t.getContext("2d");x.clearRect(0,0,W,H);
+  x.globalAlpha=.28;x.drawImage(base.cv,0,0);x.globalAlpha=1;x.drawImage(workCanvas,0,0);
+  const r=Math.max(5,W/45);
+  for(const m of st.marks){const px=m.x*W,py=m.y*H;x.lineWidth=Math.max(2,r/2.5);x.strokeStyle="#FFFFFF";x.fillStyle=m.m==="keep"?"#1F9D55":"#E0306F";
+    x.beginPath();x.arc(px,py,r,0,7);x.fill();x.stroke();
+    x.strokeStyle="#FFFFFF";x.beginPath();if(m.m==="keep"){x.moveTo(px-r*.5,py);x.lineTo(px+r*.5,py);x.moveTo(px,py-r*.5);x.lineTo(px,py+r*.5)}else{x.moveTo(px-r*.45,py-r*.45);x.lineTo(px+r*.45,py+r*.45);x.moveTo(px+r*.45,py-r*.45);x.lineTo(px-r*.45,py+r*.45)}x.stroke()}}
+$("#markSeg").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(!b)return;st.markMode=b.dataset.m;$("#markSeg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+$("#thumb").addEventListener("click",e=>{if(!base)return;const t=e.currentTarget,r=t.getBoundingClientRect();
+  const s=Math.min(r.width/base.W,r.height/base.H),ox=(r.width-base.W*s)/2,oy=(r.height-base.H*s)/2,x=(e.clientX-r.left-ox)/(base.W*s),y=(e.clientY-r.top-oy)/(base.H*s);
+  if(x<0||y<0||x>1||y>1)return;st.marks.push({x,y,m:st.markMode});regenerate()});
+$("#clearMarks").addEventListener("click",()=>{if(!st.marks.length)return;st.marks=[];regenerate()});
+function loadFile(f){if(!f||!f.type.startsWith("image/"))return toast("이미지 파일만 올릴 수 있어요");
+  const url=URL.createObjectURL(f),im=new Image();im.onload=()=>{st.img=im;base=null;st.marks=[];regenerate();toast("도안으로 바꿨어요. 배경이 이상하면 사진 미리보기를 눌러 고쳐 보세요")};im.onerror=()=>toast("이 이미지는 열 수 없어요. 다른 파일로 시도해 주세요");im.src=url}
+const drop=$("#drop");
+drop.addEventListener("click",()=>$("#file").click());
+drop.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#file").click()}});
+$("#file").addEventListener("change",e=>{loadFile(e.target.files[0]);e.target.value=""});
+["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("over")}));
+["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("over")}));
+drop.addEventListener("drop",e=>loadFile(e.dataTransfer.files[0]));
+document.addEventListener("paste",e=>{const it=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith("image/"));if(it){if(st.mode!=="photo")$("#tab-photo").click();loadFile(it.getAsFile())}});
+
+let rt;const later=fn=>{clearTimeout(rt);rt=setTimeout(fn,140)};
+function bindRange(id,key,fn){const el=$("#"+id),out=$("#"+id+"Out");el.value=st[key];out.textContent=st[key];
+  el.addEventListener("input",()=>{st[key]=+el.value;out.textContent=el.value;later(fn)})}
+const regenPhoto=()=>{if(st.mode==="photo"&&st.img)regenerate()};
+bindRange("imgW","imgW",regenPhoto);bindRange("maxColors","maxColors",regenPhoto);bindRange("bgTol","bgTol",regenPhoto);
+bindRange("textH","textH",()=>{if(st.mode==="text")regenerate()});
+bindRange("boardN","boardN",render);
+bindRange("roundD","roundD",()=>{if(st.shape==="round")regenerate()});
+$("#wPresets").addEventListener("click",e=>{const b=e.target.closest("[data-w]");if(!b)return;st.imgW=+b.dataset.w;$("#imgW").value=st.imgW;$("#imgWOut").textContent=st.imgW;regenPhoto()});
+[["crop","crop"],["clean","clean"],["outline","outline"]].forEach(([id,k])=>{$("#"+id).checked=st[k];$("#"+id).addEventListener("change",e=>{st[k]=e.target.checked;regenPhoto()})});
+$("#textIn").addEventListener("input",e=>{st.text=e.target.value;later(()=>{if(st.mode==="text")regenerate()})});
+$("#textColorBtn").addEventListener("click",()=>{st.textHex=B.list[st.brush].hex;if(st.mode==="text")regenerate()});
+$("#shapeSeg").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{st.shape=b.dataset.v;
+  $("#shapeSeg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  $("#sqField").hidden=st.shape!=="square";$("#rdField").hidden=st.shape!=="round";regenerate()}));
+$("#guides").addEventListener("change",e=>{st.guides=e.target.checked;renderBoard()});
+$("#nums").addEventListener("change",e=>{st.nums=e.target.checked;renderBoard()});
+
+const sel=$("#brand");BRANDS.forEach(b=>{const o=document.createElement("option");o.value=b.id;o.textContent=`${b.name} (${b.size} · ${b.c.split(";").length}색)`;sel.append(o)});sel.value=st.brand;
+sel.addEventListener("change",()=>{
+  const old=B;B=palette(sel.value);st.brand=sel.value;save();
+  const map={};st.cells=st.cells.map(c=>{if(c<0)return c;if(!(c in map))map[c]=nearest(old.list[c].lab,B.auto);return map[c]});
+  undo.length=0;$("#undoBtn").disabled=true;
+  const bi=nearest(old.list[st.brush].lab,B.auto);buildPalette();st.focus=null;setBrush(bi,`${B.name} 색 번호로 바꿨어요. 브랜드마다 색이 조금씩 달라서 가장 가까운 색으로 맞췄어요.`);render();
+});
+
+/* ---------- export ---------- */
+function listText(){const list=legendList(),total=list.reduce((s,r)=>s+r.n,0),sz=sizeInfo();
+  return[`비즈 도안 색 목록 · ${B.name} ${B.size}`,`${st.w}×${st.h}칸 · 완성 약 ${sz.wcm}×${sz.hcm}cm · ${st.mask?"원형 판":"사각 판 "+boardsNeeded()+"장"}`,"",
+    ...list.map(r=>`${r.no}. ${B.list[r.i].code} ${B.list[r.i].name} — ${r.n}개`),"",`총 ${fmt(total)}개 (분실 대비 색마다 10% 정도 여유 있게 준비하세요)`].join("\n")}
+function openModal(kind,payload){const img=$("#modalImg"),ta=$("#modalText");img.hidden=kind!=="img";ta.hidden=kind!=="text";
+  if(kind==="img"){img.src=payload;$("#modalTitle").textContent="도안 이미지";$("#modalNote").textContent="이미지를 길게 누르거나(휴대폰) 우클릭해서(PC) 저장하세요."}
+  else{ta.value=payload;$("#modalTitle").textContent="색 목록";$("#modalNote").textContent="자동 복사가 막혀 있어요. 아래 글을 선택해서 복사해 주세요.";setTimeout(()=>ta.select(),30)}
+  $("#modal").hidden=false;$("#modalClose").focus()}
+$("#modalClose").addEventListener("click",()=>$("#modal").hidden=true);
+$("#modal").addEventListener("click",e=>{if(e.target.id==="modal")$("#modal").hidden=true});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("#modal").hidden=true});
+$("#copyBtn").addEventListener("click",()=>{const t=listText();try{navigator.clipboard.writeText(t).then(()=>toast("색 목록을 복사했어요"),()=>openModal("text",t))}catch(e){openModal("text",t)}});
+$("#exportBtn").addEventListener("click",()=>{
+  const list=legendList(),total=list.reduce((s,r)=>s+r.n,0),sz=sizeInfo();
+  const cs=Math.max(16,Math.min(28,Math.floor(1000/st.w))),bw=st.w*cs,bh=st.h*cs,pad=36;
+  const W=Math.max(bw,640)+pad*2,cols=W>=820?3:2,colW=(W-pad*2)/cols,rowH=30,rows=Math.ceil(list.length/cols),H=pad+66+bh+44+rows*rowH+50;
+  const c=document.createElement("canvas");c.width=W*2;c.height=H*2;const x=c.getContext("2d");x.scale(2,2);
+  x.fillStyle="#FFFFFF";x.fillRect(0,0,W,H);x.fillStyle="#18202F";x.font='34px "Do Hyeon",sans-serif';x.textAlign="left";x.fillText("비즈 도안",pad,pad+30);
+  x.font='500 14px "IBM Plex Sans KR",sans-serif';x.fillStyle="#5B6477";
+  x.fillText(`${B.name} ${B.size} · ${st.w}×${st.h}칸 · 완성 약 ${sz.wcm}×${sz.hcm}cm · 총 ${fmt(total)}개`,pad,pad+54);
+  x.save();x.translate((W-bw)/2,pad+66);drawBoard(x,cs,{well:"#FFFFFF",peg:"#ECEFF4",dot:"#C3CAD7",guide:"#8F99AC",board:"#E0306F",guides:true,nums:true,focus:null,list});x.restore();
+  const y0=pad+66+bh+44;x.font='500 14px "IBM Plex Sans KR",sans-serif';
+  list.forEach((r,k)=>{const p=B.list[r.i],cx=pad+(k%cols)*colW,cy=y0+Math.floor(k/cols)*rowH;
+    x.fillStyle=p.hex;x.beginPath();x.arc(cx+11,cy-5,11,0,7);x.fill();x.strokeStyle=shade(p.rgb,.78);x.lineWidth=1.5;x.stroke();
+    x.fillStyle=p.lab[0]>62?"#1A2030":"#FFFFFF";x.font='600 11px "IBM Plex Mono",monospace';x.textAlign="center";x.fillText(r.no,cx+11,cy-1);
+    x.textAlign="left";x.fillStyle="#18202F";x.font='600 14px "IBM Plex Mono",monospace';x.fillText(p.code,cx+30,cy);
+    const cw=x.measureText(p.code).width;x.font='14px "IBM Plex Sans KR",sans-serif';x.fillStyle="#5B6477";
+    let nm=p.name;while(x.measureText(nm).width>colW-cw-110&&nm.length>3)nm=nm.slice(0,-2)+"…";x.fillText(nm,cx+36+cw,cy);
+    x.textAlign="right";x.fillStyle="#18202F";x.fillText(`${fmt(r.n)}개`,cx+colW-14,cy)});
+  x.textAlign="left";x.fillStyle="#9AA4B6";x.font='12px "IBM Plex Sans KR",sans-serif';x.fillText("비즈 도안 메이커로 만들었어요",pad,H-22);
+  openModal("img",c.toDataURL("image/png"));
+});
+
+let tt;function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2600)}
+let rz;window.addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(renderBoard,120)});
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",renderBoard);
+new MutationObserver(renderBoard).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+
+buildPalette();setBrush(nearHex("#E0306F"));setTool(null);setTool(null);
+regenerate().then(()=>{undo.length=0;$("#undoBtn").disabled=true});
+document.fonts?.ready?.then(()=>renderBoard());
+})();
+</script>
+
+<footer style="max-width:1200px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:.8rem;display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between">
+  <span>회원가입 없이 쓰는 무료 도구예요. 올린 사진은 내 기기 안에서만 처리되고 서버로 보내지지 않아요.</span>
+  <a href="../" style="color:inherit">다른 도구 보기</a>
+</footer>
+</body>
+</html>

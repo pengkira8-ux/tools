@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>펭키라 도구함 | 가입 없이 쓰는 무료 생활 도구</title>
+<meta name="description" content="회원가입도 개인정보도 필요 없는 무료 웹 도구 모음. 비즈 도안 메이커부터 차례로 추가돼요.">
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF0F5;--surface:#FFFFFF;--ink:#18202F;--muted:#5B6477;--line:#D3D9E3;--accent:#E0306F;--soft:#FCE3EC}
+@media (prefers-color-scheme:dark){:root{--bg:#11141B;--surface:#1A1E28;--ink:#E8ECF3;--muted:#98A1B3;--line:#2B3141;--accent:#FF5A97;--soft:#3A1F2C;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "IBM Plex Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:40px 16px 60px}
+h1{font-family:"Do Hyeon",sans-serif;font-weight:400;font-size:clamp(2rem,6vw,2.8rem);margin:0;line-height:1.1}
+.lede{color:var(--muted);margin:8px 0 28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tool{display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:14px;background:var(--surface);border:1px solid var(--line);color:inherit;text-decoration:none}
+a.tool:hover{border-color:var(--accent);background:var(--soft)}
+.tool b{font-family:"Do Hyeon",sans-serif;font-weight:400;font-size:1.35rem}
+.tool span{color:var(--muted);font-size:.9rem}
+.tag{align-self:flex-start;font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--accent)}
+.soon{opacity:.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>펭키라 도구함</h1>
+  <p class="lede">회원가입도, 개인정보도 필요 없는 무료 생활 도구를 하나씩 만들고 있어요.</p>
+  <div class="grid">
+    <a class="tool" href="beads/"><span class="tag">사용 가능</span><b>비즈 도안 메이커</b><span>사진·글자를 비즈 도안으로. 아트칼·펄러·하마 실제 색 번호와 구슬 개수까지.</span></a>
+    <div class="tool soon"><span class="tag">준비 중</span><b>제철 캘린더</b><span>이번 주 놓치면 1년 기다려야 하는 제철 음식과 풍경.</span></div>
+    <div class="tool soon"><span class="tag">준비 중</span><b>지원사업 매칭기</b><span>조건 3개만 고르면 신청 가능한 청년 지원사업을 바로.</span></div>
+  </div>
+</div>
+</body>
+</html>
