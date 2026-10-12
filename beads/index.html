@@ -114,10 +114,12 @@ h2{font-family:var(--display);font-weight:400;font-size:1.45rem;margin:0}
 .field label output{font-family:var(--mono);color:var(--muted)}
 input[type=range]{width:100%;accent-color:var(--accent)}
 input[type=text],input[type=number],select{font:inherit;width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
-.tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.tpl{font:inherit;font-size:.82rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px 4px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tpl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.tpl-cat{grid-column:1/-1;font-size:.75rem;font-weight:600;color:var(--muted);letter-spacing:.04em;margin-top:6px}
+.tpl-cat:first-child{margin-top:0}
+.tpl{font:inherit;font-size:.76rem;min-width:0;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px 4px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
 .tpl[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.tpl canvas{width:52px;height:52px}
+.tpl canvas{width:44px;height:44px}
 .drop{border:1.5px dashed var(--guide);border-radius:12px;padding:18px 14px;text-align:center;color:var(--muted);cursor:pointer;font-size:.88rem}
 .drop.over{border-color:var(--accent);background:var(--accent-soft)}
 .drop strong{color:var(--ink);display:block;font-size:1rem;margin-bottom:2px}
@@ -306,9 +308,24 @@ const TPL={
   flower:{name:"꽃",map:{P:"#F49AC1",Y:"#F7D23E",G:"#2E9B4F"},rows:["...PP.PP...","..PPPPPPP..",".PPPPPPPPP.",".PPPYYYPPP.","..PPYYYPP..",".PPPYYYPPP.",".PPPPPPPPP.","..PPPPPPP..","...PP.PP...",".....G.....","...GGG.GG..","....GGG...."]},
   cat:{name:"고양이",map:{K:"#2A2A2E",Y:"#F7D23E",P:"#F49AC1",W:"#F7F7F2"},rows:["K.........K","KK.......KK","KKKKKKKKKKK","KKKKKKKKKKK","KKYKKKKKYKK","KKYKKKKKYKK","KKKKKPKKKKK","WKKKKKKKKKW","KKKKWKWKKKK",".KKKKKKKKK.","..KKKKKKK.."]},
   clover:{name:"네잎클로버",map:{G:"#2E9B4F",D:"#1D5B3A",L:"#A8D65A"},rows:["..GGG.GGG..",".GGLGGGLGG.",".GGGGDGGGG.","..GGGDGGG..","GGGGDDDGGGG","GLGDDDDDGLG","GGGGDDDGGGG","..GGGDGGG..",".GGGGDGGGG.",".GGLG.DLGG.","..GGG..D...","........D.."]},
+  pumpkin:{name:"호박",map:{O:"#F28C28",D:"#C2571A",G:"#2E9B4F",K:"#1B1B1E"},rows:[".....GG.....",".....G......","..OODOODOO..",".OOODOODOOO.","OOKKODDOKKOO","OOKKODDOKKOO","OOOODOODOOOO","OKOODOODOOKO","OOKKKKKKKKOO",".OOKOKKOKOO.","..OOOOOOOO..","....OOOO...."]},
+  ghost:{name:"유령",map:{W:"#F7F7F2",K:"#1B1B1E",P:"#F49AC1"},rows:["...WWWWW...","..WWWWWWW..",".WWWWWWWWW.",".WWKWWWKWW.",".WWKWWWKWW.",".WPWWWWWPW.",".WWWWKWWWW.",".WWWWWWWWW.",".WWWWWWWWW.",".WW.WWW.WW.",".W...W...W."]},
+  bat:{name:"박쥐",map:{K:"#2A2A2E",Y:"#F7D23E"},rows:["K...........K","KK...K.K...KK","KKK..KKK..KKK","KKKKKKKKKKKKK","KKKKKYKYKKKKK",".KKKKKKKKKKK.","..KK.KKK.KK..","......K......"]},
+  tree:{name:"트리",map:{G:"#2E9B4F",Y:"#F7D23E",R:"#D7263D",B:"#8A5A3B"},rows:[".....Y.....","....YYY....",".....G.....","....GGG....","...GRGGG...","..GGGGGRG..","...GGYGG...","..GGGGGGG..",".GRGGGGGYG.","GGGGGRGGGGG","....BBB....","....BBB...."]},
+  snowman:{name:"눈사람",map:{W:"#F7F7F2",K:"#1B1B1E",O:"#F28C28",R:"#D7263D"},rows:["....KKK....","...KKKKK...","..KKKKKKK..","...WWWWW...","..WKWWWKW..","..WWWOOWW..","...WWWWW...","..RRRRRRR..",".WWWWRRWWW.","WWWWWKWWWWW","WWWWWWWWWWW","WWWWWKWWWWW",".WWWWWWWWW.","..WWWWWWW.."]},
+  star:{name:"별",map:{Y:"#F7D23E",O:"#F28C28"},rows:[".....Y.....",".....Y.....","....YYY....","....YYY....","YYYYYYYYYYY",".YYYYYYYYY.","..YYYYYYY..","...YYYYY...","...YYOYY...","..YYY.YYY..","..YY...YY..",".Y.......Y."]},
+  rainbow:{name:"무지개",map:{R:"#D7263D",O:"#F28C28",Y:"#F7D23E",G:"#2E9B4F",B:"#2C6FD1",V:"#6B3FA0",W:"#F7F7F2"},rows:["...RRRRRRRR...","..ROOOOOOOOR..",".ROYYYYYYYYOR.","ROYGGGGGGGGYOR","ROYGBBBBBBGYOR","ROYGBVVVVBGYOR","ROYGBV..VBGYOR","WWWWW....WWWWW","WWWWWW..WWWWWW"]},
+  bear:{name:"곰",map:{B:"#8A5A3B",L:"#D9B48F",K:"#1B1B1E"},rows:[".BB.....BB.","BBBB...BBBB","BBBBBBBBBBB",".BBBBBBBBB.","BBKBBBBBKBB","BBBBBBBBBBB","BBBBLLLBBBB","BBBLLKLLBBB",".BBLLLLLBB.","..BBBBBBB.."]},
+  rabbit:{name:"토끼",map:{W:"#F7F7F2",P:"#F49AC1",K:"#1B1B1E"},rows:[".WW...WW.",".WP...PW.",".WP...PW.",".WP...PW.",".WWWWWWW.","WWWWWWWWW","WWKWWWKWW","WPWWKWWPW","WWWWWWWWW",".WWWWWWW."]},
+  dog:{name:"강아지",map:{B:"#8A5A3B",L:"#F3E3B5",K:"#1B1B1E",P:"#F49AC1"},rows:["BB.......BB","BBBLLLLLBBB","BBLLLLLLLBB","BBLKLLLKLBB",".BLLLLLLLB.","..LLLKLLL..","..LLKKKLL..","...LLPLL...","....LLL...."]},
+  penguin:{name:"펭귄",map:{K:"#1F2A5A",W:"#F7F7F2",O:"#F28C28"},rows:["...KKKKK...","..KKKKKKK..",".KKWWKWWKK.",".KWKWWWKWK.",".KWWWOWWWK.","KKWWOOOWWKK","KKWWWWWWWKK","KKWWWWWWWKK",".KWWWWWWWK.","..KWWWWWK..","..OO...OO.."]},
+  cherry:{name:"체리",map:{R:"#D7263D",G:"#2E9B4F",W:"#F7F7F2"},rows:[".......GG..","......G....",".....G.G...","....G...G..","...G....G..",".RRR...RRR.","RWRRR.RWRRR","RRRRR.RRRRR","RRRRR.RRRRR",".RRR...RRR."]},
+  icecream:{name:"아이스크림",map:{R:"#D7263D",P:"#F49AC1",W:"#F7F7F2",C:"#D9B48F",D:"#8A5A3B"},rows:[".....R.....","...PPPPP...","..PPWPPPP..",".PPWPPPPPP.",".PPPPPPPPP.","PPPPPPPPPPP",".PCPCPCPCP.","..CDCDCDC..","..CCDCDCC..","...CDCDC...","...CCDCC...","....CDC....",".....C....."]},
+  mushroom:{name:"버섯",map:{R:"#D7263D",W:"#F7F7F2",L:"#F3E3B5",K:"#1B1B1E"},rows:["...RRRRR...","..RRWWRRR..",".RRWWWRRWR.","RRRRWRRRWWR","RWWRRRRRRRR","RWWRRRWWRRR",".RRRRRRRRR.","...LLLLL...","...LKLKL...","...LLLLL...","...LLLLL..."]},
 };
+const CATS=[["할로윈·겨울",["pumpkin","ghost","bat","tree","snowman"]],["동물",["cat","bear","rabbit","dog","penguin"]],["기본",["heart","star","rainbow","berry","cherry","icecream","mushroom","flower","smile","clover"]]];
 
-const st={mode:"template",tpl:"heart",w:11,h:10,cells:[],mask:null,tool:null,brush:0,focus:null,
+const st={mode:"template",tpl:"pumpkin",w:11,h:10,cells:[],mask:null,tool:null,brush:0,focus:null,
   brand:"artkal_s",shape:"square",boardN:29,roundD:29,guides:true,nums:false,
   img:null,marks:[],markMode:"bg",imgW:29,maxColors:10,bgTol:14,crop:true,clean:true,outline:false,text:"LOVE",textH:10,textHex:"#D7263D",cs:24};
 try{const s=JSON.parse(localStorage.getItem("beadmaker2")||"{}");if(s.brand&&BRANDS.some(b=>b.id===s.brand))st.brand=s.brand}catch(e){}
@@ -557,12 +574,12 @@ $("#swapBtn").addEventListener("click",()=>{if(st.focus==null)return;pushUndo();
 
 /* ---------- controls ---------- */
 const tpls=$("#tplGrid");
-Object.entries(TPL).forEach(([k,t])=>{
+CATS.forEach(([cat,keys])=>{const hd=document.createElement("div");hd.className="tpl-cat";hd.textContent=cat;tpls.append(hd);keys.forEach(k=>{const t=TPL[k];
   const b=document.createElement("button");b.className="tpl";b.dataset.k=k;b.setAttribute("aria-pressed",k===st.tpl);
   const c=document.createElement("canvas"),w=Math.max(...t.rows.map(r=>r.length)),h=t.rows.length,u=Math.floor(104/Math.max(w,h));
   c.width=104;c.height=104;const x=c.getContext("2d"),ox=(104-w*u)/2,oy=(104-h*u)/2;
   t.rows.forEach((r,yy)=>[...r].forEach((ch,xx)=>{if(ch!=="."){x.fillStyle=t.map[ch];x.beginPath();x.arc(ox+xx*u+u/2,oy+yy*u+u/2,u*.45,0,7);x.fill()}}));
-  b.append(c,document.createTextNode(t.name));tpls.append(b)});
+  b.append(c,document.createTextNode(t.name));tpls.append(b)})});
 tpls.addEventListener("click",e=>{const b=e.target.closest(".tpl");if(!b)return;st.tpl=b.dataset.k;tpls.querySelectorAll(".tpl").forEach(t=>t.setAttribute("aria-pressed",t===b));regenerate()});
 
 const tabs=["template","photo","text"];
