@@ -60,7 +60,11 @@
   .list a.dl, .list button.view { font: inherit; font-size: .85rem; font-weight: 600; padding: 6px 12px; border-radius: 8px; text-decoration: none; cursor: pointer; }
   .list a.dl { background: var(--accent); color: var(--accent-ink); border: 0; }
   .list button.view { background: transparent; color: var(--ink); border: 1px solid var(--line); }
-  .bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; flex: 1 1 100%; }
+  .list button.rm { order: 9; width: 28px; height: 28px; padding: 0; font: inherit; font-size: 1.1rem; line-height: 1; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--sub); cursor: pointer; }
+  .list button.rm:hover { color: var(--err); border-color: var(--err); }
+  .list button.rm:disabled { opacity: .35; cursor: not-allowed; }
+  button.clear { display: block; margin: 8px 0 0 auto; padding: 4px 0; font: inherit; font-size: .82rem; border: 0; background: none; color: var(--sub); text-decoration: underline; cursor: pointer; }
+  .bar { order: 10; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; flex: 1 1 100%; }
   .bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .1s; }
   .compare { position: relative; margin-top: 14px; border-radius: 10px; overflow: hidden; background: #000; line-height: 0; }
   .compare img { width: 100%; display: block; }
@@ -141,6 +145,7 @@
       <button class="stop hidden" id="stop" type="button">중단</button>
     </div>
     <ul class="list" id="list"></ul>
+    <button class="clear hidden" id="clear" type="button">목록 전체 지우기</button>
 
     <div id="previewBox" class="hidden">
       <div class="compare" id="compare">
@@ -295,7 +300,7 @@ function workerMain() {
   if (typeof document === 'undefined') return;
   var $ = function (id) { return document.getElementById(id); };
   var drop = $('drop'), fileInput = $('file'), go = $('go'), stopBtn = $('stop'), list = $('list');
-  var items = [], busy = false, cancelled = false;
+  var items = [], busy = false, cancelled = false, previewItem = null;
   var workerUrl = URL.createObjectURL(new Blob(['(' + workerMain.toString() + ')()'], { type: 'text/javascript' }));
 
   function pick(name) { return document.querySelector('input[name=' + name + ']:checked').value; }
@@ -329,32 +334,48 @@ function workerMain() {
       var li = document.createElement('li');
       var name = document.createElement('span'); name.className = 'name'; name.textContent = f.name;
       var meta = document.createElement('span'); meta.className = 'meta'; meta.textContent = fmtBytes(f.size) + ' · 대기 중';
-      li.appendChild(name); li.appendChild(meta);
+      var rm = document.createElement('button'); rm.className = 'rm'; rm.type = 'button'; rm.textContent = '×';
+      rm.title = '목록에서 삭제'; rm.setAttribute('aria-label', f.name + ' 삭제');
+      li.appendChild(name); li.appendChild(meta); li.appendChild(rm);
       list.appendChild(li);
-      items.push({ file: f, li: li, meta: meta, state: 'wait' });
+      var it = { file: f, li: li, meta: meta, rm: rm, state: 'wait', urls: [] };
+      rm.addEventListener('click', function () { removeItem(it); });
+      items.push(it);
     });
     refresh();
   }
+  function removeItem(it) {
+    if (it.state === 'run') return;
+    var idx = items.indexOf(it);
+    if (idx >= 0) items.splice(idx, 1);
+    it.li.remove();
+    it.urls.forEach(function (u) { URL.revokeObjectURL(u); });
+    if (previewItem === it) { previewItem = null; $('previewBox').classList.add('hidden'); }
+    refresh();
+  }
+  $('clear').addEventListener('click', function () { items.slice().forEach(removeItem); });
   function refresh() {
     go.disabled = busy || !items.some(function (it) { return it.state === 'wait'; });
     go.textContent = busy ? '변환 중…' : '변환 시작';
     stopBtn.classList.toggle('hidden', !busy);
+    $('clear').classList.toggle('hidden', busy || items.length === 0);
   }
   stopBtn.addEventListener('click', function () { cancelled = true; });
 
   go.addEventListener('click', async function () {
     busy = true; cancelled = false; refresh();
-    for (var i = 0; i < items.length; i++) {
-      if (items[i].state !== 'wait') continue;
-      if (cancelled) break;
-      try { await convert(items[i]); }
+    var it;
+    while (!cancelled && (it = items.find(function (x) { return x.state === 'wait'; }))) {
+      it.state = 'run'; it.rm.disabled = true;
+      try { await convert(it); }
       catch (err) {
-        var b = items[i].li.querySelector('.bar'); if (b) b.remove();
-        if (err && err.cancelled) { items[i].meta.textContent = '중단됨 · 대기 중'; break; }
-        items[i].state = 'err';
-        items[i].meta.className = 'meta err';
-        items[i].meta.textContent = '실패: ' + (err && err.message || err);
+        var b = it.li.querySelector('.bar'); if (b) b.remove();
+        if (err && err.cancelled) { it.state = 'wait'; it.rm.disabled = false; it.meta.textContent = '중단됨 · 대기 중'; break; }
+        it.state = 'err';
+        it.meta.className = 'meta err';
+        it.meta.textContent = '실패: ' + (err && err.message || err);
       }
+      it.rm.disabled = false;
     }
     busy = false; refresh();
   });
@@ -515,14 +536,16 @@ function workerMain() {
     it.meta.textContent = dw + '×' + dh + ' · ' + fmtBytes(blob.size) + (useAi ? ' · AI' : '');
     var view = document.createElement('button'); view.className = 'view'; view.type = 'button'; view.textContent = '비교';
     var before = URL.createObjectURL(it.file);
-    view.addEventListener('click', function () { showPreview(before, url); });
+    it.urls.push(before, url);
+    view.addEventListener('click', function () { showPreview(before, url, it); });
     var a2 = document.createElement('a'); a2.className = 'dl'; a2.href = url; a2.textContent = '내려받기';
     a2.download = it.file.name.replace(/\.[^.]+$/, '') + '_' + label + '.' + ext;
     it.li.appendChild(view); it.li.appendChild(a2);
-    showPreview(before, url);
+    showPreview(before, url, it);
   }
 
-  function showPreview(before, after) {
+  function showPreview(before, after, it) {
+    previewItem = it;
     $('imgBefore').src = before; $('imgAfter').src = after;
     $('previewBox').classList.remove('hidden');
     setSlide(+$('slide').value);
