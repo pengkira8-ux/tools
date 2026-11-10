@@ -68,6 +68,8 @@
   .compare .tag { position: absolute; top: 8px; padding: 2px 8px; font-size: .75rem; line-height: 1.5; background: rgba(0,0,0,.6); color: #fff; border-radius: 6px; }
   .compare .tag.l { left: 8px; } .compare .tag.r { right: 8px; }
   .compare .divider { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; box-shadow: 0 0 4px rgba(0,0,0,.6); pointer-events: none; }
+  /* 광고 자리는 평소에 숨김. 광고 코드를 넣은 뒤 class="ad on" 으로 바꾸면 보입니다 */
+  .ad:not(.on) { display: none !important; }
   .ad { margin-top: 18px; min-height: 100px; display: flex; align-items: center; justify-content: center;
         border: 1px dashed var(--line); border-radius: 12px; color: var(--sub); font-size: .8rem; }
   h2 { font-size: 1.15rem; margin: 0 0 8px; }
