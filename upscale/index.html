@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 사진 고화질 변환 - 2K·4K·8K 화질 개선 (무료, 업로드 없음)</title>
+<meta name="description" content="사진을 2K, 4K, 최대 8K 고화질로 변환하는 무료 도구. 빠른 변환과 AI 정밀 변환 두 가지 방식을 지원하며, 회원가입과 업로드 없이 브라우저 안에서만 처리됩니다.">
+<meta property="og:title" content="AI 사진 고화질 변환 - 2K·4K·8K">
+<meta property="og:description" content="업로드 없이 브라우저에서 바로. 빠른 변환과 AI 정밀 변환 중 골라 쓰세요.">
+<meta property="og:type" content="website">
+
+<!-- [애드센스] 승인받은 뒤 아래 주석을 풀고 ca-pub 번호를 내 것으로 바꾸세요
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+-->
+
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --ink: #14181f; --sub: #5b6472; --line: #e2e6ec;
+    --accent: #1f6feb; --accent-ink: #ffffff; --ok: #12805c; --err: #c0362c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f1216; --card: #181c22; --ink: #eef1f5; --sub: #9aa4b2; --line: #2a303a;
+            --accent: #4c8dff; --accent-ink: #0b0e12; --ok: #45c79a; --err: #ff7b6e; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+         line-height: 1.6; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 28px 16px 64px; }
+  header h1 { font-size: 1.7rem; margin: 0 0 6px; letter-spacing: -0.02em; }
+  header p { margin: 0; color: var(--sub); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-top: 18px; }
+  .drop { border: 2px dashed var(--line); border-radius: 12px; padding: 34px 16px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s; }
+  .drop:hover, .drop.over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent); }
+  .drop strong { display: block; font-size: 1.05rem; }
+  .drop span { color: var(--sub); font-size: .9rem; }
+  .opts { display: grid; gap: 16px; margin-top: 18px; }
+  .opt-label { font-size: .85rem; font-weight: 600; color: var(--sub); margin-bottom: 6px; }
+  .seg { display: flex; gap: 8px; flex-wrap: wrap; }
+  .seg label { flex: 1 1 110px; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg .pill { display: block; text-align: center; padding: 10px 8px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; font-weight: 600; }
+  .seg .pill small { display: block; font-weight: 400; color: var(--sub); font-size: .75rem; }
+  .seg input:checked + .pill { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .seg input:focus-visible + .pill { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .row > div { flex: 1 1 220px; }
+  .hint { margin: 6px 0 0; font-size: .82rem; color: var(--sub); }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .actions { display: flex; gap: 8px; margin-top: 18px; }
+  button.go { flex: 1; padding: 14px; font-size: 1.05rem; font-weight: 700; border: 0; border-radius: 12px;
+              background: var(--accent); color: var(--accent-ink); cursor: pointer; }
+  button.go:disabled { opacity: .45; cursor: not-allowed; }
+  button.stop { padding: 14px 18px; font: inherit; font-weight: 600; border: 1px solid var(--line); border-radius: 12px; background: transparent; color: var(--ink); cursor: pointer; }
+  .list { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 8px; }
+  .list li { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; flex-wrap: wrap; }
+  .list .name { flex: 1 1 180px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+  .list .meta { color: var(--sub); font-size: .82rem; }
+  .list .ok { color: var(--ok); } .list .err { color: var(--err); }
+  .list a.dl, .list button.view { font: inherit; font-size: .85rem; font-weight: 600; padding: 6px 12px; border-radius: 8px; text-decoration: none; cursor: pointer; }
+  .list a.dl { background: var(--accent); color: var(--accent-ink); border: 0; }
+  .list button.view { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; flex: 1 1 100%; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .1s; }
+  .compare { position: relative; margin-top: 14px; border-radius: 10px; overflow: hidden; background: #000; line-height: 0; }
+  .compare img { width: 100%; display: block; }
+  .compare img.before { position: absolute; inset: 0; height: 100%; object-fit: fill; }
+  .compare .tag { position: absolute; top: 8px; padding: 2px 8px; font-size: .75rem; line-height: 1.5; background: rgba(0,0,0,.6); color: #fff; border-radius: 6px; }
+  .compare .tag.l { left: 8px; } .compare .tag.r { right: 8px; }
+  .compare .divider { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; box-shadow: 0 0 4px rgba(0,0,0,.6); pointer-events: none; }
+  .ad { margin-top: 18px; min-height: 100px; display: flex; align-items: center; justify-content: center;
+        border: 1px dashed var(--line); border-radius: 12px; color: var(--sub); font-size: .8rem; }
+  h2 { font-size: 1.15rem; margin: 0 0 8px; }
+  .prose p, .prose li { color: var(--sub); }
+  .prose h3 { font-size: 1rem; margin: 16px 0 4px; }
+  footer { margin-top: 28px; color: var(--sub); font-size: .82rem; text-align: center; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>AI 사진 고화질 변환 (2K · 4K · 8K)</h1>
+    <p>사진을 큰 해상도로 키우고 또렷하게 만듭니다. 업로드 없이 내 기기 안에서만 처리돼요.</p>
+  </header>
+
+  <!-- 광고 1: 상단. 이 div 안을 애드센스 광고 단위 코드로 교체 -->
+  <div class="ad" id="ad-top">광고 영역 (상단)</div>
+
+  <section class="card">
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="사진 선택">
+      <strong>여기에 사진을 끌어다 놓거나 눌러서 선택</strong>
+      <span>JPG · PNG · WebP, 여러 장 가능</span>
+      <input type="file" id="file" accept="image/*" multiple class="hidden">
+    </div>
+
+    <div class="opts">
+      <div>
+        <div class="opt-label">변환 방식</div>
+        <div class="seg">
+          <label><input type="radio" name="mode" value="fast" checked><span class="pill">빠른 변환<small>몇 초 · 크기 키우기에 적합</small></span></label>
+          <label><input type="radio" name="mode" value="ai"><span class="pill">AI 정밀 변환<small>수십 초~몇 분 · 디테일 보강</small></span></label>
+        </div>
+        <p class="hint" id="modeHint">크기를 키우고 윤곽을 다듬습니다. 인쇄·배경화면용으로 해상도만 맞추면 될 때 좋아요.</p>
+      </div>
+      <div>
+        <div class="opt-label">해상도 (긴 변 기준)</div>
+        <div class="seg">
+          <label><input type="radio" name="size" value="2560"><span class="pill">2K<small>2560px</small></span></label>
+          <label><input type="radio" name="size" value="3840" checked><span class="pill">4K<small>3840px</small></span></label>
+          <label><input type="radio" name="size" value="7680"><span class="pill">8K<small>7680px</small></span></label>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="opt-label">저장 형식</div>
+          <div class="seg">
+            <label><input type="radio" name="fmt" value="image/jpeg" checked><span class="pill">JPG</span></label>
+            <label><input type="radio" name="fmt" value="image/png"><span class="pill">PNG</span></label>
+            <label><input type="radio" name="fmt" value="image/webp"><span class="pill">WebP</span></label>
+          </div>
+        </div>
+        <div id="sharpBox">
+          <div class="opt-label">선명도 <span id="sharpVal">보통</span></div>
+          <input type="range" id="sharp" min="0" max="100" value="45" aria-label="선명도">
+        </div>
+        <div id="aiBox" class="hidden">
+          <div class="opt-label">AI 품질</div>
+          <div class="seg">
+            <label><input type="radio" name="aiq" value="slim" checked><span class="pill">표준<small>빠름</small></span></label>
+            <label><input type="radio" name="aiq" value="medium"><span class="pill">고품질<small>느림</small></span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="go" id="go" disabled>변환 시작</button>
+      <button class="stop hidden" id="stop" type="button">중단</button>
+    </div>
+    <ul class="list" id="list"></ul>
+
+    <div id="previewBox" class="hidden">
+      <div class="compare" id="compare">
+        <img class="after" id="imgAfter" alt="변환 후">
+        <img class="before" id="imgBefore" alt="변환 전">
+        <span class="tag l">원본</span><span class="tag r">변환</span>
+        <div class="divider" id="divider"></div>
+      </div>
+      <input type="range" id="slide" min="0" max="100" value="50" aria-label="전후 비교">
+    </div>
+  </section>
+
+  <!-- 광고 2: 결과 아래 -->
+  <div class="ad" id="ad-mid">광고 영역 (중간)</div>
+
+  <section class="card prose">
+    <h2>사용 방법</h2>
+    <ol>
+      <li>사진을 끌어다 놓거나 눌러서 선택합니다. 여러 장을 한 번에 넣을 수 있습니다.</li>
+      <li>변환 방식(빠른 변환 또는 AI 정밀 변환)과 해상도, 저장 형식을 고릅니다.</li>
+      <li>변환 시작을 누르고, 끝나면 내려받기를 누릅니다.</li>
+    </ol>
+
+    <h2>자주 묻는 질문</h2>
+    <h3>빠른 변환과 AI 정밀 변환은 무엇이 다른가요?</h3>
+    <p>빠른 변환은 란초스(Lanczos) 보간으로 크기를 키우고 윤곽을 다듬는 방식으로, 몇 초면 끝납니다. AI 정밀 변환은 초해상도(super-resolution) 신경망이 사진을 작은 조각으로 나눠 디테일을 보강하면서 키우는 방식이라 더 또렷하지만 시간이 걸립니다.</p>
+    <h3>사진이 서버에 올라가나요?</h3>
+    <p>아니요. 두 방식 모두 지금 보고 있는 브라우저 안에서만 처리되고, 사진은 어디로도 전송되지 않습니다. AI 방식은 처음 쓸 때 AI 모델 파일(수 MB)만 내려받습니다. 회원가입도 필요 없습니다.</p>
+    <h3>2K, 4K, 8K는 각각 얼마나 큰가요?</h3>
+    <p>긴 변 기준으로 2K는 2560픽셀, 4K는 3840픽셀, 8K는 7680픽셀입니다. 원본의 가로세로 비율은 그대로 유지됩니다.</p>
+    <h3>AI 변환이 너무 오래 걸려요.</h3>
+    <p>AI 변환 속도는 기기의 그래픽 성능에 따라 크게 달라집니다. AI 품질을 표준으로 바꾸거나 해상도를 낮추면 빨라집니다. 휴대폰보다 PC의 크롬이나 엣지에서 훨씬 빠릅니다.</p>
+    <h3>8K 변환이 실패해요.</h3>
+    <p>8K는 메모리를 많이 씁니다. 휴대폰이나 오래된 기기에서는 실패할 수 있으니 PC에서 시도하거나 4K를 선택하세요.</p>
+    <h3>심하게 흐린 사진도 살릴 수 있나요?</h3>
+    <p>AI 정밀 변환이 윤곽과 질감을 보강해 주지만, 초점이 완전히 나갔거나 아주 작은 사진은 복원에 한계가 있습니다. 원본 상태가 좋을수록 결과도 좋습니다.</p>
+    <h3>어떤 형식으로 저장하는 게 좋나요?</h3>
+    <p>사진은 JPG가 용량이 작고 무난합니다. 글자나 그림이 있는 이미지는 PNG, 웹에 올릴 용도라면 WebP를 권합니다. 투명 배경은 빠른 변환에서 PNG나 WebP로 저장할 때만 유지됩니다.</p>
+  </section>
+
+  <!-- 광고 3: 하단 -->
+  <div class="ad" id="ad-bottom">광고 영역 (하단)</div>
+
+  <footer>사진은 기기 밖으로 나가지 않습니다 · 무료 · 설치 없음</footer>
+</div>
+
+<script>
+/* ---------- 설정: AI 라이브러리와 모델 위치 ---------- */
+var TF_URL = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js';
+var MODEL_URL = {
+  slim:   'https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan-slim@1.0.0/models/',
+  medium: 'https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan-medium@1.0.0/models/'
+};
+var TILE = 128, PAD = 8; // AI 조각 크기와 겹침(이음매 방지)
+
+/* ---------- 워커: 란초스 리샘플 + 샤픈 ---------- */
+function workerMain() {
+  function lanczos(x) {
+    x = Math.abs(x);
+    if (x < 1e-6) return 1;
+    if (x >= 3) return 0;
+    var px = Math.PI * x;
+    return 3 * Math.sin(px) * Math.sin(px / 3) / (px * px);
+  }
+  function weights(srcN, dstN) {
+    var scale = dstN / srcN, fs = Math.max(1, 1 / scale), support = 3 * fs;
+    var maxTaps = Math.ceil(support) * 2 + 2;
+    var starts = new Int32Array(dstN), sizes = new Int32Array(dstN), w = new Float32Array(dstN * maxTaps);
+    for (var i = 0; i < dstN; i++) {
+      var center = (i + 0.5) / scale;
+      var left = Math.max(0, Math.floor(center - support));
+      var right = Math.min(srcN - 1, Math.ceil(center + support));
+      var sum = 0, n = 0, base = i * maxTaps;
+      for (var j = left; j <= right && n < maxTaps; j++, n++) {
+        var v = lanczos((j + 0.5 - center) / fs);
+        w[base + n] = v; sum += v;
+      }
+      if (sum !== 0) for (var k = 0; k < n; k++) w[base + k] /= sum;
+      starts[i] = left; sizes[i] = n;
+    }
+    return { starts: starts, sizes: sizes, w: w, maxTaps: maxTaps };
+  }
+  function resize(src, sw, sh, dw, dh, sharpen, progress) {
+    var wx = weights(sw, dw), wy = weights(sh, dh);
+    // 1) 가로
+    var tmp = new Uint8ClampedArray(dw * sh * 4);
+    for (var y = 0; y < sh; y++) {
+      var srow = y * sw * 4, trow = y * dw * 4;
+      for (var x = 0; x < dw; x++) {
+        var st = wx.starts[x], n = wx.sizes[x], b = x * wx.maxTaps;
+        var r = 0, g = 0, bl = 0, a = 0;
+        for (var k = 0; k < n; k++) {
+          var wt = wx.w[b + k], p = srow + (st + k) * 4;
+          r += src[p] * wt; g += src[p + 1] * wt; bl += src[p + 2] * wt; a += src[p + 3] * wt;
+        }
+        var o = trow + x * 4;
+        tmp[o] = r; tmp[o + 1] = g; tmp[o + 2] = bl; tmp[o + 3] = a;
+      }
+      if ((y & 63) === 0) progress(0.3 * y / sh);
+    }
+    // 2) 세로
+    var out = new Uint8ClampedArray(dw * dh * 4);
+    var rowLen = dw * 4, acc = new Float32Array(rowLen);
+    for (var y2 = 0; y2 < dh; y2++) {
+      var st2 = wy.starts[y2], n2 = wy.sizes[y2], b2 = y2 * wy.maxTaps;
+      acc.fill(0);
+      for (var k2 = 0; k2 < n2; k2++) {
+        var wt2 = wy.w[b2 + k2], off = (st2 + k2) * rowLen;
+        for (var i = 0; i < rowLen; i++) acc[i] += tmp[off + i] * wt2;
+      }
+      out.set(acc, y2 * rowLen);
+      if ((y2 & 63) === 0) progress(0.3 + 0.5 * y2 / dh);
+    }
+    tmp = null;
+    // 3) 샤픈 (제자리 처리, 원본 행 2개만 보관)
+    if (sharpen > 0 && dw > 2 && dh > 2) {
+      var prev = new Uint8ClampedArray(rowLen), cur = new Uint8ClampedArray(rowLen);
+      prev.set(out.subarray(0, rowLen));
+      for (var y3 = 1; y3 < dh - 1; y3++) {
+        var ro = y3 * rowLen;
+        cur.set(out.subarray(ro, ro + rowLen));
+        var nx = ro + rowLen;
+        for (var x3 = 4; x3 < rowLen - 4; x3 += 4) {
+          for (var c = 0; c < 3; c++) {
+            var q = x3 + c, cv = cur[q];
+            var avg = (prev[q] + out[nx + q] + cur[q - 4] + cur[q + 4]) * 0.25;
+            out[ro + q] = cv + sharpen * (cv - avg);
+          }
+        }
+        var t = prev; prev = cur; cur = t;
+        if ((y3 & 63) === 0) progress(0.8 + 0.2 * y3 / dh);
+      }
+    }
+    return out;
+  }
+  self.onmessage = function (e) {
+    var d = e.data;
+    try {
+      var out = resize(new Uint8ClampedArray(d.src), d.sw, d.sh, d.dw, d.dh, d.sharpen, function (p) {
+        self.postMessage({ type: 'progress', p: p });
+      });
+      self.postMessage({ type: 'done', out: out.buffer }, [out.buffer]);
+    } catch (err) {
+      self.postMessage({ type: 'error', message: String(err && err.message || err) });
+    }
+  };
+  self.__resize = resize; // 테스트용
+}
+
+/* ---------- 화면 ---------- */
+(function () {
+  if (typeof document === 'undefined') return;
+  var $ = function (id) { return document.getElementById(id); };
+  var drop = $('drop'), fileInput = $('file'), go = $('go'), stopBtn = $('stop'), list = $('list');
+  var items = [], busy = false, cancelled = false;
+  var workerUrl = URL.createObjectURL(new Blob(['(' + workerMain.toString() + ')()'], { type: 'text/javascript' }));
+
+  function pick(name) { return document.querySelector('input[name=' + name + ']:checked').value; }
+  function fmtBytes(n) { return n > 1048576 ? (n / 1048576).toFixed(1) + 'MB' : Math.round(n / 1024) + 'KB'; }
+
+  $('sharp').addEventListener('input', function () {
+    var v = +this.value;
+    $('sharpVal').textContent = v === 0 ? '끔' : v < 30 ? '약하게' : v < 65 ? '보통' : '강하게';
+  });
+  document.querySelectorAll('input[name=mode]').forEach(function (r) {
+    r.addEventListener('change', function () {
+      var ai = pick('mode') === 'ai';
+      $('sharpBox').classList.toggle('hidden', ai);
+      $('aiBox').classList.toggle('hidden', !ai);
+      $('modeHint').textContent = ai
+        ? 'AI가 디테일을 보강하며 키웁니다. 흐릿하거나 작은 사진에 좋아요. 기기 성능에 따라 시간이 걸립니다.'
+        : '크기를 키우고 윤곽을 다듬습니다. 인쇄·배경화면용으로 해상도만 맞추면 될 때 좋아요.';
+    });
+  });
+
+  drop.addEventListener('click', function () { fileInput.click(); });
+  drop.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+  ['dragenter', 'dragover'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (e) { addFiles(e.dataTransfer.files); });
+  fileInput.addEventListener('change', function () { addFiles(fileInput.files); fileInput.value = ''; });
+
+  function addFiles(files) {
+    Array.prototype.forEach.call(files, function (f) {
+      if (!/^image\//.test(f.type)) return;
+      var li = document.createElement('li');
+      var name = document.createElement('span'); name.className = 'name'; name.textContent = f.name;
+      var meta = document.createElement('span'); meta.className = 'meta'; meta.textContent = fmtBytes(f.size) + ' · 대기 중';
+      li.appendChild(name); li.appendChild(meta);
+      list.appendChild(li);
+      items.push({ file: f, li: li, meta: meta, state: 'wait' });
+    });
+    refresh();
+  }
+  function refresh() {
+    go.disabled = busy || !items.some(function (it) { return it.state === 'wait'; });
+    go.textContent = busy ? '변환 중…' : '변환 시작';
+    stopBtn.classList.toggle('hidden', !busy);
+  }
+  stopBtn.addEventListener('click', function () { cancelled = true; });
+
+  go.addEventListener('click', async function () {
+    busy = true; cancelled = false; refresh();
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].state !== 'wait') continue;
+      if (cancelled) break;
+      try { await convert(items[i]); }
+      catch (err) {
+        var b = items[i].li.querySelector('.bar'); if (b) b.remove();
+        if (err && err.cancelled) { items[i].meta.textContent = '중단됨 · 대기 중'; break; }
+        items[i].state = 'err';
+        items[i].meta.className = 'meta err';
+        items[i].meta.textContent = '실패: ' + (err && err.message || err);
+      }
+    }
+    busy = false; refresh();
+  });
+
+  /* 란초스 워커 실행 */
+  function runWorker(buf, sw, sh, dw, dh, sharpen, onProgress) {
+    return new Promise(function (resolve, reject) {
+      var w = new Worker(workerUrl);
+      w.onmessage = function (e) {
+        if (e.data.type === 'progress') onProgress(e.data.p);
+        else if (e.data.type === 'done') { w.terminate(); resolve(e.data.out); }
+        else { w.terminate(); reject(new Error(e.data.message)); }
+      };
+      w.onerror = function () { w.terminate(); reject(new Error('메모리가 부족합니다. 더 낮은 해상도를 선택하세요.')); };
+      w.postMessage({ src: buf, sw: sw, sh: sh, dw: dw, dh: dh, sharpen: sharpen }, [buf]);
+    });
+  }
+
+  /* AI 라이브러리·모델 불러오기 (처음 한 번만) */
+  var tfPromise = null, models = {};
+  function loadTf() {
+    if (!tfPromise) tfPromise = new Promise(function (resolve, reject) {
+      var s = document.createElement('script'); s.src = TF_URL;
+      s.onload = function () {
+        tf.ready().then(function () {
+          try { tf.env().set('WEBGL_DELETE_TEXTURE_THRESHOLD', 0); } catch (e) {}
+          resolve();
+        }, reject);
+      };
+      s.onerror = function () { tfPromise = null; reject(new Error('AI 엔진을 불러오지 못했습니다. 인터넷 연결을 확인하세요.')); };
+      document.head.appendChild(s);
+    });
+    return tfPromise;
+  }
+  async function loadModel(quality, factor) {
+    await loadTf();
+    var key = quality + factor;
+    if (!models[key]) {
+      try { models[key] = await tf.loadLayersModel(MODEL_URL[quality] + 'x' + factor + '/model.json'); }
+      catch (e) { throw new Error('AI 모델을 불러오지 못했습니다. 인터넷 연결을 확인하세요.'); }
+    }
+    return models[key];
+  }
+
+  /* AI 업스케일: 입력 캔버스를 조각내어 factor배로 키운 캔버스를 돌려줌 */
+  async function aiUpscale(cin, factor, quality, onProgress) {
+    var model = await loadModel(quality, factor);
+    var iw = cin.width, ih = cin.height;
+    var cx = cin.getContext('2d', { willReadFrequently: true });
+    var cout = document.createElement('canvas'); cout.width = iw * factor; cout.height = ih * factor;
+    var ox = cout.getContext('2d');
+    if (!ox) throw new Error('이 기기에서는 이 해상도를 지원하지 않습니다.');
+    var cols = Math.ceil(iw / TILE), rows = Math.ceil(ih / TILE), total = cols * rows, done = 0;
+    for (var ty = 0; ty < rows; ty++) {
+      for (var tx = 0; tx < cols; tx++) {
+        if (cancelled) { var ce = new Error('중단됨'); ce.cancelled = true; throw ce; }
+        var x0 = tx * TILE, y0 = ty * TILE;
+        var x1 = Math.min(iw, x0 + TILE), y1 = Math.min(ih, y0 + TILE);
+        var px0 = Math.max(0, x0 - PAD), py0 = Math.max(0, y0 - PAD);
+        var px1 = Math.min(iw, x1 + PAD), py1 = Math.min(ih, y1 + PAD);
+        var tile = cx.getImageData(px0, py0, px1 - px0, py1 - py0);
+        var outT = tf.tidy(function () {
+          var t = tf.browser.fromPixels(tile, 3).toFloat().expandDims(0);
+          return model.predict(t).squeeze([0]).clipByValue(0, 255).round();
+        });
+        var rgb = await outT.data();
+        var oh = outT.shape[0], ow = outT.shape[1];
+        outT.dispose();
+        var rgba = new Uint8ClampedArray(ow * oh * 4);
+        for (var i = 0, j = 0; i < rgb.length; i += 3, j += 4) {
+          rgba[j] = rgb[i]; rgba[j + 1] = rgb[i + 1]; rgba[j + 2] = rgb[i + 2]; rgba[j + 3] = 255;
+        }
+        // 겹친 테두리는 버리고 가운데만 붙임
+        ox.putImageData(new ImageData(rgba, ow, oh), px0 * factor, py0 * factor,
+          (x0 - px0) * factor, (y0 - py0) * factor, (x1 - x0) * factor, (y1 - y0) * factor);
+        done++;
+        onProgress(done, total);
+        await tf.nextFrame();
+      }
+    }
+    return cout;
+  }
+
+  async function convert(it) {
+    var target = +pick('size'), type = pick('fmt'), mode = pick('mode'), quality = pick('aiq');
+    var sharpen = (+$('sharp').value / 100) * 1.2;
+    var bar = document.createElement('div'); bar.className = 'bar'; bar.innerHTML = '<i></i>';
+    it.li.appendChild(bar);
+    function setBar(p) { bar.firstChild.style.width = Math.round(p * 100) + '%'; }
+    it.meta.className = 'meta';
+    it.meta.textContent = '읽는 중…';
+
+    var bmp = await createImageBitmap(it.file);
+    var sw = bmp.width, sh = bmp.height;
+    var k = target / Math.max(sw, sh);
+    var dw = Math.max(1, Math.round(sw * k)), dh = Math.max(1, Math.round(sh * k));
+    var useAi = mode === 'ai' && k > 1;
+
+    var c0 = document.createElement('canvas'); c0.width = sw; c0.height = sh;
+    var x0 = c0.getContext('2d', { willReadFrequently: true });
+    if (useAi) { x0.fillStyle = '#fff'; x0.fillRect(0, 0, sw, sh); } // AI는 투명을 다루지 않음
+    x0.drawImage(bmp, 0, 0); bmp.close && bmp.close();
+
+    var sizeText = sw + '×' + sh + ' → ' + dw + '×' + dh;
+    var outBuf;
+    if (!useAi) {
+      var src = x0.getImageData(0, 0, sw, sh).data;
+      c0.width = c0.height = 0;
+      it.meta.textContent = sizeText;
+      outBuf = await runWorker(src.buffer, sw, sh, dw, dh, sharpen, setBar);
+    } else {
+      // AI 배율(2배 또는 4배)을 정하고, 결과가 목표 크기를 넘지 않도록 입력을 맞춤
+      var factor = k > 2 ? 4 : 2;
+      var iw = Math.min(sw, Math.ceil(dw / factor)), ih = Math.min(sh, Math.ceil(dh / factor));
+      var cin = c0;
+      if (iw < sw || ih < sh) {
+        it.meta.textContent = sizeText + ' · 준비 중';
+        var pre = await runWorker(x0.getImageData(0, 0, sw, sh).data.buffer, sw, sh, iw, ih, 0, function () {});
+        c0.width = iw; c0.height = ih;
+        x0 = c0.getContext('2d', { willReadFrequently: true });
+        x0.putImageData(new ImageData(new Uint8ClampedArray(pre), iw, ih), 0, 0);
+      }
+      it.meta.textContent = sizeText + ' · AI 모델 불러오는 중';
+      var cai = await aiUpscale(cin, factor, quality, function (d, t) {
+        setBar(0.9 * d / t);
+        it.meta.textContent = sizeText + ' · AI 처리 ' + d + '/' + t;
+      });
+      c0.width = c0.height = 0;
+      var aw = cai.width, ah = cai.height;
+      var aiData = cai.getContext('2d').getImageData(0, 0, aw, ah).data;
+      cai.width = cai.height = 0;
+      it.meta.textContent = sizeText + ' · 마무리 중';
+      if (aw === dw && ah === dh) outBuf = aiData.buffer;
+      else outBuf = await runWorker(aiData.buffer, aw, ah, dw, dh, 0, function (p) { setBar(0.9 + 0.1 * p); });
+    }
+
+    var px = new Uint8ClampedArray(outBuf);
+    if (type === 'image/jpeg') { // 투명 영역은 흰색으로
+      for (var i = 3; i < px.length; i += 4) {
+        var a = px[i];
+        if (a < 255) { var inv = 255 - a; px[i - 3] = (px[i - 3] * a + 255 * inv) / 255; px[i - 2] = (px[i - 2] * a + 255 * inv) / 255; px[i - 1] = (px[i - 1] * a + 255 * inv) / 255; px[i] = 255; }
+      }
+    }
+    var c = document.createElement('canvas'); c.width = dw; c.height = dh;
+    var ctx = c.getContext('2d');
+    if (!ctx) throw new Error('이 기기에서는 이 해상도를 지원하지 않습니다.');
+    ctx.putImageData(new ImageData(px, dw, dh), 0, 0);
+    var blob = await new Promise(function (res) { c.toBlob(res, type, 0.92); });
+    c.width = c.height = 0;
+    if (!blob) throw new Error('이 기기에서는 이 해상도를 지원하지 않습니다. 더 낮은 해상도를 선택하세요.');
+
+    var ext = type === 'image/png' ? 'png' : type === 'image/webp' ? 'webp' : 'jpg';
+    var label = (target === 2560 ? '2K' : target === 3840 ? '4K' : '8K') + (useAi ? '_AI' : '');
+    var url = URL.createObjectURL(blob);
+    bar.remove();
+    it.state = 'done';
+    it.meta.className = 'meta ok';
+    it.meta.textContent = dw + '×' + dh + ' · ' + fmtBytes(blob.size) + (useAi ? ' · AI' : '');
+    var view = document.createElement('button'); view.className = 'view'; view.type = 'button'; view.textContent = '비교';
+    var before = URL.createObjectURL(it.file);
+    view.addEventListener('click', function () { showPreview(before, url); });
+    var a2 = document.createElement('a'); a2.className = 'dl'; a2.href = url; a2.textContent = '내려받기';
+    a2.download = it.file.name.replace(/\.[^.]+$/, '') + '_' + label + '.' + ext;
+    it.li.appendChild(view); it.li.appendChild(a2);
+    showPreview(before, url);
+  }
+
+  function showPreview(before, after) {
+    $('imgBefore').src = before; $('imgAfter').src = after;
+    $('previewBox').classList.remove('hidden');
+    setSlide(+$('slide').value);
+  }
+  function setSlide(v) {
+    $('imgBefore').style.clipPath = 'inset(0 ' + (100 - v) + '% 0 0)';
+    $('divider').style.left = v + '%';
+  }
+  $('slide').addEventListener('input', function () { setSlide(+this.value); });
+})();
+</script>
+</body>
+</html>
